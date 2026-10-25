@@ -166,7 +166,7 @@ body::after {
 .capa {
   position: fixed; inset: 0;
   background: rgba(30, 34, 42, 0.86);
-  display: grid; place-items: center;
+  display: grid; place-items: center; place-items: safe center;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 20px;
@@ -289,7 +289,22 @@ body::after {
 .boton-mini:focus-visible { outline: 3px solid var(--maillot); outline-offset: 2px; }
 .ficha input[type=file] { display: none; }
 #preparar .tarjeta { max-width: 600px; width: 100%; }
-#preparar { overflow-y: auto; }
+#preparar, #privacidad { overflow-y: auto; }
+.aviso {
+  margin: 0; max-width: 520px; display: flex; gap: 10px; align-items: flex-start; text-align: left;
+  font-family: var(--f-lcd); font-size: 1.25rem; line-height: 1.15; color: var(--tiza-suave);
+  border: 2px dashed rgba(79, 214, 232, 0.45); border-radius: 10px; padding: 8px 12px;
+}
+.aviso svg { flex: none; margin-top: 2px; color: var(--cian); }
+.enlace {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font: inherit; color: var(--cian); text-decoration: underline; text-underline-offset: 3px;
+}
+.enlace:focus-visible { outline: 3px solid var(--maillot); outline-offset: 2px; }
+.legal { text-align: left; max-width: 62ch; display: grid; gap: 12px; font-family: var(--f-ui); font-size: 1rem; line-height: 1.5; color: var(--tiza); }
+.legal h3 { margin: 6px 0 0; font-family: var(--f-arcade); font-weight: 400; font-size: .8rem; color: var(--ocaso-1); line-height: 1.5; }
+.legal p, .legal ul { margin: 0; }
+.legal ul { padding-left: 1.2em; display: grid; gap: 4px; }
 @media (max-width: 560px) {
   #turno span { display: none; }
   #locutor { font-size: 1.35rem; }
@@ -337,7 +352,7 @@ body::after {
       <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="17" cy="7" r="3.5"/><path d="M14.5 9.5L5 19"/><path d="M5 19l1-5M5 19l5-1"/></svg>
       Tira de la chapa hacia atrás y suelta. ¡Si te sales, vuelves atrás!
     </div>
-    <div class="creditos">RÉCORD <b id="record">--</b> TIROS<br>© 1987 CHAPAS SOFT</div>
+    <div class="creditos">RÉCORD <b id="record">--</b> TIROS<br>© 1987 CHAPAS SOFT · <button class="enlace" type="button" id="b-priv-menu">PRIVACIDAD</button></div>
   </div>
 </div>
 
@@ -352,9 +367,40 @@ body::after {
       <button class="boton-mini" type="button" id="b-normal">NORMAL</button>
       <button class="boton-mini" type="button" id="b-facil">FÁCIL CON VALLAS</button>
     </div>
+    <p class="aviso">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      <span>Las fotos y los nombres se guardan solo en este dispositivo y no se envían a ningún sitio. Si pones la foto de un niño, que sea con permiso de sus padres. <button class="enlace" type="button" id="b-priv-preparar">Más información</button></span>
+    </p>
     <div class="opciones">
       <button class="boton amarillo" id="b-correr">¡A CORRER!</button>
       <button class="boton" id="b-volver">VOLVER</button>
+    </div>
+  </div>
+</div>
+
+<div class="capa" id="privacidad" hidden>
+  <div class="tarjeta">
+    <h2 class="titulo" style="font-size: clamp(1.2rem, 5vw, 2rem)">PRIVACIDAD</h2>
+    <div class="legal">
+      <p>La Vuelta de Chapas es un juego sin anuncios, sin cuentas y sin servidor propio. Esto es todo lo que hace con tus datos.</p>
+      <h3>QUÉ SE GUARDA</h3>
+      <ul>
+        <li>El <b>nombre</b> y la <b>foto</b> que pongas a cada chapa. La foto se recorta y se reduce a 160 × 160 píxeles; la original no se guarda.</li>
+        <li>El <b>récord</b> de tiros y si prefieres el <b>modo fácil</b>.</li>
+      </ul>
+      <h3>DÓNDE</h3>
+      <p>Solo en el almacenamiento local del navegador de este dispositivo. <b>Nada se envía</b> a ningún servidor, ni al autor ni a terceros. Cada móvil o tablet tiene sus propios datos.</p>
+      <h3>QUÉ NO HACE</h3>
+      <p>No usa cookies, ni analítica, ni publicidad, ni rastreadores. Las letras y el resto de archivos se descargan de la propia web del juego.</p>
+      <h3>FOTOS DE NIÑOS</h3>
+      <p>Si pones la foto de un menor, hazlo solo si eres su padre, madre o tutor, o con su permiso.</p>
+      <h3>CÓMO BORRARLO</h3>
+      <p>Con el botón <b>QUITAR</b> de cada foto, con el botón de abajo o borrando los datos de esta web en los ajustes del navegador.</p>
+      <p id="priv-borrado" hidden><b>Listo: se han borrado los nombres, las fotos, el récord y las preferencias de este dispositivo.</b></p>
+    </div>
+    <div class="opciones">
+      <button class="boton" id="b-priv-borrar">BORRAR MIS DATOS</button>
+      <button class="boton amarillo" id="b-priv-cerrar">ENTENDIDO</button>
     </div>
   </div>
 </div>
@@ -1297,6 +1343,30 @@ body::after {
   document.getElementById("b-normal").addEventListener("click", () => ponerModo(false));
   document.getElementById("b-facil").addEventListener("click", () => ponerModo(true));
   pintarModo();
+  // ---------- Privacidad ----------
+  let privDesde = null;
+  function abrirPrivacidad(desde) {
+    privDesde = desde;
+    document.getElementById("priv-borrado").hidden = true;
+    document.getElementById(desde).hidden = true;
+    document.getElementById("privacidad").hidden = false;
+  }
+  document.getElementById("b-priv-menu").addEventListener("click", () => abrirPrivacidad("menu"));
+  document.getElementById("b-priv-preparar").addEventListener("click", () => { guardarPerfiles(); abrirPrivacidad("preparar"); });
+  document.getElementById("b-priv-cerrar").addEventListener("click", () => {
+    document.getElementById("privacidad").hidden = true;
+    if (privDesde === "preparar") abrirPreparar(numJug);
+    else document.getElementById(privDesde || "menu").hidden = false;
+  });
+  document.getElementById("b-priv-borrar").addEventListener("click", () => {
+    ["vuelta-perfiles", "vuelta-record", "vuelta-facil"].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+    perfiles = [{}, {}, {}, {}];
+    imagenes.length = 0;
+    if (modoFacil) { modoFacil = false; pintarModo(); medir(); }
+    pintarRecord();
+    document.getElementById("priv-borrado").hidden = false;
+  });
+
   document.getElementById("b-volver").addEventListener("click", () => {
     guardarPerfiles();
     document.getElementById("preparar").hidden = true;
