@@ -52,7 +52,9 @@ async function esperarQuieto(p) {
   const p = await abrir(1180, 820);
   await p.screenshot({ path: resolve(docs, "menu-tablet.png") });
   await p.click("#b-jug-4");
-  await espera(500);
+  await espera(300);
+  await p.click("#b-correr");
+  await espera(1300);
   await tirar(p, -260, 30);               // amarillo
   await esperarQuieto(p);
   await tirar(p, -170, -6);               // rojo
@@ -71,7 +73,9 @@ async function esperarQuieto(p) {
   const p = await abrir(390, 844);
   await p.screenshot({ path: resolve(docs, "menu-movil.png") });
   await p.click("#b-jug-2");
-  await espera(500);
+  await espera(300);
+  await p.click("#b-correr");
+  await espera(1300);
 
   const fotos = resolve(docs, ".fotogramas");
   rmSync(fotos, { recursive: true, force: true });

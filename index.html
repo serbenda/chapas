@@ -227,6 +227,54 @@ body::after {
 .ganador-chapa { width: 120px; height: 120px; font-size: 2.6rem; box-shadow: 0 0 0 6px #9aa0aa, 0 8px 18px var(--sombra); animation: giro 1.2s ease-out; }
 @keyframes giro { from { transform: rotate(-360deg) scale(.2); } }
 .instruccion { display: flex; align-items: center; gap: 10px; font-family: var(--f-lcd); font-size: 1.5rem; color: var(--tiza-suave); text-align: left; }
+.mini-chapa.con-foto, #carrera .punto.con-foto {
+  background-size: cover; background-position: center;
+  box-shadow: 0 0 0 3px var(--c), 0 0 0 5px #9aa0aa, 0 3px 6px var(--sombra);
+  color: transparent;
+}
+/* Cartel de turno */
+#cartel {
+  position: fixed; inset: 0; z-index: 15;
+  display: grid; place-items: center;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(20, 22, 28, 0.78) 0 40%, rgba(20, 22, 28, 0) 75%);
+  opacity: 0; transition: opacity .18s ease;
+}
+#cartel.visible { opacity: 1; }
+#cartel .dentro { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+#cartel .mini-chapa { width: 110px; height: 110px; font-size: 2.4rem; }
+#cartel.visible .mini-chapa { animation: giro .7s ease-out; }
+#cartel p {
+  margin: 0; font-family: var(--f-arcade); font-size: clamp(1.1rem, 5vw, 2rem);
+  color: var(--tiza); text-align: center; line-height: 1.4;
+  text-shadow: 3px 0 0 var(--ocaso-3), -3px 0 0 var(--cian);
+}
+#cartel p span { display: block; color: var(--ocaso-1); }
+/* Preparar corredores */
+.fichas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; width: min(560px, 100%); }
+.ficha {
+  display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center;
+  background: rgba(14, 16, 22, 0.6); border: 2px solid rgba(244, 240, 228, 0.18);
+  border-radius: 14px; padding: 12px; text-align: left;
+}
+.ficha .mini-chapa { width: 64px; height: 64px; font-size: 1.5rem; grid-row: span 2; }
+.ficha input[type=text] {
+  min-width: 0; width: 100%; box-sizing: border-box;
+  font-family: var(--f-lcd); font-size: 1.6rem; text-transform: uppercase;
+  background: #1d1f24; color: var(--ocaso-1); border: 2px solid rgba(244, 240, 228, 0.3);
+  border-radius: 8px; padding: 2px 8px;
+}
+.ficha input[type=text]:focus-visible { outline: 3px solid var(--maillot); outline-offset: 1px; }
+.ficha .acciones { display: flex; gap: 8px; }
+.boton-mini {
+  font-family: var(--f-arcade); font-size: .6rem; color: #1d1f24; background: var(--tiza);
+  border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; box-shadow: 0 3px 0 #b9b3a3;
+}
+.boton-mini.secundario { background: transparent; color: var(--tiza-suave); box-shadow: inset 0 0 0 2px rgba(244, 240, 228, 0.3); }
+.boton-mini:focus-visible { outline: 3px solid var(--maillot); outline-offset: 2px; }
+.ficha input[type=file] { display: none; }
+#preparar .tarjeta { max-width: 600px; width: 100%; }
+#preparar { overflow-y: auto; }
 @media (max-width: 560px) {
   #turno span { display: none; }
   #locutor { font-size: 1.35rem; }
@@ -235,7 +283,7 @@ body::after {
   .boton-icono { width: 42px; height: 42px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  #pista-ayuda, .ganador-chapa, .parpadea, #locutor .onair { animation: none; }
+  #pista-ayuda, .ganador-chapa, .parpadea, #locutor .onair, #cartel.visible .mini-chapa { animation: none; }
 }
 </style>
 
@@ -245,6 +293,9 @@ body::after {
   <div id="hud">
     <div id="turno"><div class="mini-chapa" id="turno-chapa">1</div><span id="turno-texto">¡Te toca!</span></div>
     <div id="carrera" aria-label="Posiciones de la carrera"><div class="meta-mini"></div></div>
+    <button class="boton-icono" id="b-vista" aria-label="Ver todo el circuito" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path id="vista-fuera" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path id="vista-dentro" d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" hidden/></svg>
+    </button>
     <button class="boton-icono" id="b-sonido" aria-label="Sonido">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="onda" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path id="mute" d="M17 9l5 6M22 9l-5 6" hidden/></svg>
     </button>
@@ -272,6 +323,20 @@ body::after {
       Tira de la chapa hacia atrás y suelta. ¡Si te sales, vuelves atrás!
     </div>
     <div class="creditos">RÉCORD <b id="record">--</b> TIROS<br>© 1987 CHAPAS SOFT</div>
+  </div>
+</div>
+
+<div id="cartel" aria-live="polite"><div class="dentro"><div class="mini-chapa" id="cartel-chapa">1</div><p>TURNO DE<span id="cartel-nombre">AMARILLO</span></p></div></div>
+
+<div class="capa" id="preparar" hidden>
+  <div class="tarjeta">
+    <h2 class="titulo" style="font-size: clamp(1.3rem, 5vw, 2.2rem)">CORREDORES</h2>
+    <p class="sub">Pon tu nombre y tu foto</p>
+    <div class="fichas" id="fichas"></div>
+    <div class="opciones">
+      <button class="boton amarillo" id="b-correr">¡A CORRER!</button>
+      <button class="boton" id="b-volver">VOLVER</button>
+    </div>
   </div>
 </div>
 
@@ -376,6 +441,10 @@ body::after {
   const fondo = document.createElement("canvas");
   const fctx = fondo.getContext("2d");
   let cw = 0, ch = 0, dpr = 1, esc = 1, ox = 0, oy = 0, vertical = false;
+  // cámara: en pantallas pequeñas se acerca a la chapa que tira
+  const MARGEN = 40;
+  let escFit = 1, escZoom = 1, escFondo = 1, fondoW = 1, fondoH = 1, hayZoom = false, verTodo = false;
+  const cam = { esc: 1, cx: WW / 2, cy: WH / 2 };
 
   function aPantalla(x, y) { return vertical ? [ox + y * esc, oy + x * esc] : [ox + x * esc, oy + y * esc]; }
   function aMundo(sx, sy) { const a = (sx - ox) / esc, b = (sy - oy) / esc; return vertical ? [b, a] : [a, b]; }
@@ -390,13 +459,44 @@ body::after {
     const r = lienzo.getBoundingClientRect();
     cw = Math.max(1, r.width); ch = Math.max(1, r.height);
     dpr = Math.min(window.devicePixelRatio || 1, 2.5);
-    lienzo.width = fondo.width = Math.round(cw * dpr);
-    lienzo.height = fondo.height = Math.round(ch * dpr);
+    lienzo.width = Math.round(cw * dpr);
+    lienzo.height = Math.round(ch * dpr);
     vertical = ch > cw * 1.1;
     const mw = vertical ? WH : WW, mh = vertical ? WW : WH;
-    esc = Math.min(cw / mw, ch / mh) * 0.97;
-    ox = (cw - mw * esc) / 2; oy = (ch - mh * esc) / 2;
+    escFit = Math.min(cw / mw, ch / mh) * 0.97;
+    escZoom = Math.max(escFit, 15 / R);           // la chapa mide al menos 30 px de ancho
+    hayZoom = escZoom > escFit * 1.15;
+    document.getElementById("b-vista").hidden = !hayZoom;
+    // el fondo se pinta una vez, a la resolución del zoom, y luego se recorta
+    escFondo = escZoom;
+    const maxPx = 4096 / dpr;
+    escFondo = Math.min(escFondo, maxPx / (mw + 2 * MARGEN), maxPx / (mh + 2 * MARGEN));
+    fondoW = (mw + 2 * MARGEN) * escFondo; fondoH = (mh + 2 * MARGEN) * escFondo;
+    fondo.width = Math.round(fondoW * dpr); fondo.height = Math.round(fondoH * dpr);
+    esc = escFondo; ox = oy = MARGEN * escFondo;
     pintarFondo();
+    moverCamara(true);
+  }
+  function objetivoCamara() {
+    const sigue = hayZoom && !verTodo && chapas.length && (fase === "apuntar" || fase === "rodando" || fase === "volviendo");
+    if (!sigue) return { esc: escFit, cx: WW / 2, cy: WH / 2 };
+    const c = chapas[turno];
+    const e = escZoom;
+    // medio ancho y medio alto de lo que se ve, en unidades del mundo
+    const hsx = cw / 2 / e, hsy = ch / 2 / e;
+    const hx = vertical ? hsy : hsx, hy = vertical ? hsx : hsy;
+    const lim = (v, h, tam) => h * 2 >= tam + 2 * MARGEN ? tam / 2 : Math.max(h - MARGEN, Math.min(tam + MARGEN - h, v));
+    return { esc: e, cx: lim(c.x, hx, WW), cy: lim(c.y, hy, WH) };
+  }
+  function moverCamara(salto) {
+    const o = objetivoCamara();
+    const k = salto ? 1 : 0.09;
+    cam.esc += (o.esc - cam.esc) * k;
+    cam.cx += (o.cx - cam.cx) * k;
+    cam.cy += (o.cy - cam.cy) * k;
+    esc = cam.esc;
+    ox = cw / 2 - (vertical ? cam.cy : cam.cx) * esc;
+    oy = ch / 2 - (vertical ? cam.cx : cam.cy) * esc;
   }
 
   // números pseudoaleatorios estables para que la tiza no "baile" al redimensionar
@@ -421,14 +521,14 @@ body::after {
     const c = fctx;
     transfPantalla(c);
     c.fillStyle = "#39404c";
-    c.fillRect(0, 0, cw, ch);
+    c.fillRect(0, 0, fondoW, fondoH);
     // grano del asfalto
     const r = rng(7);
-    const granos = Math.floor(cw * ch / 26);
+    const granos = Math.floor(fondoW * fondoH / 26);
     for (let i = 0; i < granos; i++) {
       const v = r();
       c.fillStyle = v < 0.5 ? "rgba(20,24,32,0.35)" : "rgba(170,178,190,0.18)";
-      c.fillRect(r() * cw, r() * ch, 1.4, 1.4);
+      c.fillRect(r() * fondoW, r() * fondoH, 1.4, 1.4);
     }
     transfMundo(c);
     // carretera: zona frotada con tiza
@@ -620,6 +720,93 @@ body::after {
   function pintarRecord() { const r = leerRecord(); document.getElementById("record").textContent = r === null ? "--" : String(r).padStart(2, "0"); }
   pintarRecord();
 
+  // ---------- Perfiles: nombre y foto de cada corredor ----------
+  let perfiles = [{}, {}, {}, {}];
+  try { const g = JSON.parse(localStorage.getItem("vuelta-perfiles") || "null"); if (Array.isArray(g)) perfiles = [0, 1, 2, 3].map(i => g[i] || {}); } catch (e) {}
+  function guardarPerfiles() { try { localStorage.setItem("vuelta-perfiles", JSON.stringify(perfiles)); } catch (e) {} }
+  const imagenes = [];
+  function imagenDe(i) {
+    const url = perfiles[i] && perfiles[i].foto;
+    if (!url) return null;
+    if (!imagenes[i] || imagenes[i].src !== url) { const im = new Image(); im.src = url; imagenes[i] = im; }
+    return imagenes[i];
+  }
+  function nombreDe(i) { const n = perfiles[i] && perfiles[i].nombre; return n && n.trim() ? n.trim() : CORREDORES[i].nombre; }
+  function pintarMiniChapa(el, c) {
+    el.style.setProperty("--c", c.color);
+    if (c.foto) { el.classList.add("con-foto"); el.style.backgroundImage = "url(" + c.foto + ")"; el.textContent = ""; }
+    else { el.classList.remove("con-foto"); el.style.backgroundImage = ""; el.textContent = c.dorsal; }
+  }
+  function leerFoto(archivo, alTerminar) {
+    const lector = new FileReader();
+    lector.onload = () => {
+      const im = new Image();
+      im.onload = () => {
+        const lado = 160, cv = document.createElement("canvas");
+        cv.width = cv.height = lado;
+        const m = Math.min(im.width, im.height);
+        cv.getContext("2d").drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, lado, lado);
+        alTerminar(cv.toDataURL("image/jpeg", 0.82));
+      };
+      im.src = lector.result;
+    };
+    lector.readAsDataURL(archivo);
+  }
+  function abrirPreparar(n) {
+    numJug = n;
+    const caja = document.getElementById("fichas");
+    caja.innerHTML = "";
+    for (let i = 0; i < n; i++) {
+      const base = CORREDORES[i];
+      const ficha = document.createElement("div");
+      ficha.className = "ficha";
+      const chapa = document.createElement("div");
+      chapa.className = "mini-chapa";
+      const entrada = document.createElement("input");
+      entrada.type = "text"; entrada.id = "nombre-" + i; entrada.maxLength = 10;
+      entrada.placeholder = base.nombre; entrada.value = (perfiles[i] && perfiles[i].nombre) || "";
+      entrada.setAttribute("aria-label", "Nombre del corredor " + base.dorsal);
+      entrada.addEventListener("input", () => { perfiles[i].nombre = entrada.value; });
+      const archivo = document.createElement("input");
+      archivo.type = "file"; archivo.accept = "image/*"; archivo.id = "foto-" + i;
+      const acciones = document.createElement("div");
+      acciones.className = "acciones";
+      const bFoto = document.createElement("button");
+      bFoto.className = "boton-mini"; bFoto.type = "button"; bFoto.textContent = "FOTO";
+      bFoto.addEventListener("click", () => archivo.click());
+      const bQuitar = document.createElement("button");
+      bQuitar.className = "boton-mini secundario"; bQuitar.type = "button"; bQuitar.textContent = "QUITAR";
+      const refrescar = () => {
+        pintarMiniChapa(chapa, { color: base.color, dorsal: base.dorsal, foto: perfiles[i].foto });
+        bQuitar.hidden = !perfiles[i].foto;
+      };
+      bQuitar.addEventListener("click", () => { delete perfiles[i].foto; refrescar(); });
+      archivo.addEventListener("change", () => {
+        const f = archivo.files && archivo.files[0];
+        if (f) leerFoto(f, url => { perfiles[i].foto = url; refrescar(); });
+        archivo.value = "";
+      });
+      acciones.append(bFoto, bQuitar, archivo);
+      ficha.append(chapa, entrada, acciones);
+      caja.appendChild(ficha);
+      refrescar();
+    }
+    document.getElementById("menu").hidden = true;
+    document.getElementById("preparar").hidden = false;
+  }
+
+  // ---------- Cartel de turno ----------
+  let cartelHasta = 0, cartelTimer = null;
+  function mostrarCartel(c) {
+    const el = document.getElementById("cartel");
+    pintarMiniChapa(document.getElementById("cartel-chapa"), c);
+    document.getElementById("cartel-nombre").textContent = c.nombre.toUpperCase();
+    el.classList.remove("visible"); void el.offsetWidth; el.classList.add("visible");
+    cartelHasta = performance.now() + 700;
+    clearTimeout(cartelTimer);
+    cartelTimer = setTimeout(() => el.classList.remove("visible"), 1100);
+  }
+
   // ---------- Estado de la partida ----------
   let chapas = [], turno = 0, fase = "menu", numJug = 2, ganador = null, primerTiro = true;
   let apunte = null;     // {sx, sy, cx, cy}
@@ -632,7 +819,7 @@ body::after {
     for (let i = 0; i < n; i++) {
       const [x, y] = enArco(sitios[i][0], sitios[i][1]);
       const k = cercano(x, y, Math.round(sitios[i][0] / PASO), 20);
-      chapas.push({ ...CORREDORES[i], x, y, vx: 0, vy: 0, idx: k.idx, arco: k.arco, guardado: null, fuera: false, vuelta: null, tiros: 0 });
+      chapas.push({ ...CORREDORES[i], nombre: nombreDe(i), foto: perfiles[i].foto || null, img: imagenDe(i), x, y, vx: 0, vy: 0, idx: k.idx, arco: k.arco, guardado: null, fuera: false, vuelta: null, tiros: 0 });
     }
     turno = 0; ganador = null; apunte = null; flotantes = []; confeti = []; tiro = null;
     document.getElementById("locutor").hidden = true;
@@ -640,16 +827,17 @@ body::after {
     if (!primerTiro) setTimeout(() => locutor("¡Arranca la etapa! ¡Mucha suerte!"), 300);
     fase = "apuntar";
     document.getElementById("menu").hidden = true;
+    document.getElementById("preparar").hidden = true;
     document.getElementById("final").hidden = true;
     pintarCarrera();
     pintarTurno();
+    moverCamara(true);
+    mostrarCartel(chapas[0]);
   }
 
   function pintarTurno() {
     const c = chapas[turno];
-    const el = document.getElementById("turno-chapa");
-    el.style.setProperty("--c", c.color);
-    el.textContent = c.dorsal;
+    pintarMiniChapa(document.getElementById("turno-chapa"), c);
     document.getElementById("turno-texto").textContent = "Te toca: " + c.nombre;
     document.getElementById("pista-ayuda").hidden = !primerTiro;
     pintarCarrera();
@@ -661,6 +849,7 @@ body::after {
       const p = document.createElement("div");
       p.className = "punto" + (i === turno && fase !== "fin" ? " activo" : "");
       p.style.setProperty("--c", c.color);
+      if (c.foto) { p.classList.add("con-foto"); p.style.backgroundImage = "url(" + c.foto + ")"; }
       p.style.left = Math.max(0, Math.min(100, (c.arco / ARCO_META) * 100)) + "%";
       cont.appendChild(p);
     });
@@ -680,7 +869,7 @@ body::after {
   function posPuntero(e) { const r = lienzo.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
   lienzo.addEventListener("pointerdown", e => {
     audio();
-    if (fase !== "apuntar") return;
+    if (fase !== "apuntar" || performance.now() < cartelHasta) return;
     const [x, y] = posPuntero(e);
     apunte = { sx: x, sy: y, cx: x, cy: y, id: e.pointerId };
     try { lienzo.setPointerCapture(e.pointerId); } catch (err) {}
@@ -721,8 +910,7 @@ body::after {
         if (k.arco >= ARCO_META && !ganador) { ganador = c; }
         if (k.dist > TW / 2 && !ganador) {
           c.fuera = true; c.vx = c.vy = 0;
-          const [sx, sy] = aPantalla(c.x, c.y);
-          flotantes.push({ t: "¡FUERA!", x: sx, y: sy, vida: 1 });
+          flotantes.push({ t: "¡FUERA!", x: c.x, y: c.y, vida: 1 });
           if (tiro) { if (c === chapas[turno]) tiro.fueraPropio = true; else tiro.fueraOtro = true; }
           sfx.fuera();
         }
@@ -768,6 +956,7 @@ body::after {
     turno = (turno + 1) % chapas.length;
     pintarTurno();
     sfx.turno();
+    if (chapas.length > 1) mostrarCartel(chapas[turno]);
   }
   function terminar() {
     fase = "fin";
@@ -786,9 +975,8 @@ body::after {
     setTimeout(() => {
       const g = ganador;
       const el = document.getElementById("ganador-chapa");
-      el.style.setProperty("--c", g.color);
-      el.textContent = g.dorsal;
-      document.getElementById("ganador-texto").textContent = "¡GANA EL " + g.nombre.toUpperCase() + "!";
+      pintarMiniChapa(el, g);
+      document.getElementById("ganador-texto").textContent = "¡GANA " + g.nombre.toUpperCase() + "!";
       document.getElementById("ganador-tiros").textContent = "en " + g.tiros + (g.tiros === 1 ? " tiro" : " tiros");
       const rec = leerRecord(), nuevo = rec === null || g.tiros < rec;
       if (nuevo) guardarRecord(g.tiros);
@@ -835,6 +1023,18 @@ body::after {
   }
   function dorsal(c, alfa) {
     const [sx, sy] = aPantalla(c.x, c.y);
+    if (c.img && c.img.complete && c.img.naturalWidth) {
+      const r = R * 0.64 * esc;
+      ctx.save();
+      ctx.globalAlpha = alfa;
+      ctx.beginPath(); ctx.arc(sx, sy, r, 0, 6.283); ctx.clip();
+      ctx.drawImage(c.img, sx - r, sy - r, r * 2, r * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.25)";
+      ctx.beginPath(); ctx.ellipse(sx - r * 0.35, sy - r * 0.45, r * 0.5, r * 0.25, -0.6, 0, 6.283); ctx.fill();
+      ctx.restore();
+      ctx.globalAlpha = 1;
+      return;
+    }
     ctx.globalAlpha = alfa;
     ctx.fillStyle = "#1d1f24";
     ctx.font = "800 " + Math.max(9, R * 0.62 * esc) + "px " + getComputedStyle(document.documentElement).getPropertyValue("--f-ui");
@@ -869,9 +1069,12 @@ body::after {
   }
 
   function dibujar() {
+    moverCamara(false);
     transfPantalla(ctx);
-    ctx.clearRect(0, 0, cw, ch);
-    ctx.drawImage(fondo, 0, 0, cw, ch);
+    ctx.fillStyle = "#39404c";
+    ctx.fillRect(0, 0, cw, ch);
+    const f = esc / escFondo;
+    ctx.drawImage(fondo, ox - MARGEN * esc, oy - MARGEN * esc, fondoW * f, fondoH * f);
     if (!chapas.length) return;
     transfMundo(ctx);
     if (fase === "apuntar" && apunte) dibujarFlecha();
@@ -884,10 +1087,11 @@ body::after {
     ctx.font = "18px " + getComputedStyle(document.documentElement).getPropertyValue("--f-arcade");
     ctx.textAlign = "center";
     flotantes.forEach(f => {
+      const [fx, fy] = aPantalla(f.x, f.y);
       ctx.globalAlpha = Math.max(0, f.vida);
       ctx.fillStyle = "#e5483a"; ctx.strokeStyle = "#f4f0e4"; ctx.lineWidth = 4;
-      ctx.strokeText(f.t, f.x, f.y - 30 - (1 - f.vida) * 30);
-      ctx.fillText(f.t, f.x, f.y - 30 - (1 - f.vida) * 30);
+      ctx.strokeText(f.t, fx, fy - 30 - (1 - f.vida) * 30);
+      ctx.fillText(f.t, fx, fy - 30 - (1 - f.vida) * 30);
     });
     ctx.globalAlpha = 1;
     confeti.forEach(p => {
@@ -943,8 +1147,20 @@ body::after {
     const fila = CORREDORES.slice(0, n).map(c => '<i style="--c:' + c.color + '"></i>').join("");
     b.innerHTML = '<span>' + n + '</span><span class="fila">' + fila + '</span>';
     b.setAttribute("aria-label", n + " corredores");
-    b.addEventListener("click", () => { audio(); nueva(n); });
+    b.addEventListener("click", () => { audio(); abrirPreparar(n); });
     opciones.appendChild(b);
+  });
+  document.getElementById("b-correr").addEventListener("click", () => { audio(); guardarPerfiles(); nueva(numJug); });
+  document.getElementById("b-volver").addEventListener("click", () => {
+    guardarPerfiles();
+    document.getElementById("preparar").hidden = true;
+    document.getElementById("menu").hidden = false;
+  });
+  document.getElementById("b-vista").addEventListener("click", () => {
+    verTodo = !verTodo;
+    document.getElementById("vista-fuera").hidden = verTodo;
+    document.getElementById("vista-dentro").hidden = !verTodo;
+    document.getElementById("b-vista").setAttribute("aria-label", verTodo ? "Seguir a la chapa" : "Ver todo el circuito");
   });
   document.getElementById("b-otra").addEventListener("click", () => { audio(); nueva(numJug); });
   document.getElementById("b-menu").addEventListener("click", () => {
@@ -965,7 +1181,7 @@ body::after {
   medir();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(medir);
   requestAnimationFrame(bucle);
-  window.__vuelta = { L, N, PX, PY, TW, ARCO_META };
+  window.__vuelta = { L, N, PX, PY, TW, ARCO_META, estado: () => ({ fase, turno, esc, hayZoom }) };
 })();
 </script>
 
