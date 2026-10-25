@@ -1,12 +1,51 @@
 // Sonido: efectos y música de 8 bits sintetizados con Web Audio (no hay archivos de audio).
 
-let actx = null, sonidoOn = true;
+let actx = null, sonidoOn = true, desbloqueado = false;
 
+// WAV mudo de 0,1 s: sonando en bucle con un <audio> hace que el iPhone trate el juego
+// como "reproducción" y no lo silencie con el interruptor de silencio.
+function wavMudo() {
+  const n = 4410, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+  const txt = (o, s) => [...s].forEach((ch, i) => v.setUint8(o + i, ch.charCodeAt(0)));
+  txt(0, "RIFF"); v.setUint32(4, 36 + n * 2, true); txt(8, "WAVE"); txt(12, "fmt ");
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, 44100, true); v.setUint32(28, 88200, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  txt(36, "data"); v.setUint32(40, n * 2, true);
+  let bin = "";
+  new Uint8Array(buf).forEach(b => { bin += String.fromCharCode(b); });
+  return "data:audio/wav;base64," + btoa(bin);
+}
+let audioMudo = null;
+
+// Debe llamarse dentro de un toque o clic: los móviles solo dejan sonar audio tras un gesto.
 export function activarAudio() {
   try {
     if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
-    if (actx.state === "suspended") actx.resume();
+    if (actx.state !== "running") actx.resume();
+    if (!desbloqueado) {
+      desbloqueado = true;
+      // Safari 17+: pedir sesión de "reproducción" (suena aunque el móvil esté en silencio)
+      try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
+      try {
+        audioMudo = new Audio(wavMudo());
+        audioMudo.loop = true;
+        audioMudo.setAttribute("playsinline", "");
+        const pr = audioMudo.play();
+        if (pr && pr.catch) pr.catch(() => {});
+      } catch (e) {}
+      // un sonido vacío dentro del gesto termina de desbloquear el audio en iOS
+      const b = actx.createBuffer(1, 1, 22050), s = actx.createBufferSource();
+      s.buffer = b; s.connect(actx.destination); s.start(0);
+    }
   } catch (e) { actx = null; }
+}
+// al volver al juego (después de bloquear el móvil o cambiar de app) el audio se queda en pausa
+if (typeof document !== "undefined") {
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && actx && actx.state !== "running") actx.resume().catch(() => {});
+  });
+  // cualquier primer toque en la pantalla sirve para activar el sonido
+  ["touchend", "click", "keydown"].forEach(ev => document.addEventListener(ev, () => activarAudio(), { passive: true }));
 }
 export function haySonido() { return sonidoOn; }
 export function alternarSonido() { sonidoOn = !sonidoOn; return sonidoOn; }
