@@ -6,6 +6,7 @@ on:
     branches: [main, development]
     paths:
       - index.html
+      - js/**
       - scripts/**
       - .github/workflows/capturas.yml
   workflow_dispatch:
@@ -38,8 +39,9 @@ jobs:
 
       - name: Guardar las imágenes
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # firmado como el dueño del repo para que el robot no aparezca como colaborador
+          git config user.name "serbenda"
+          git config user.email "serbenda@gmail.com"
           git add docs
           git diff --cached --quiet || git commit -m "docs: capturas actualizadas [skip ci]"
           git push
