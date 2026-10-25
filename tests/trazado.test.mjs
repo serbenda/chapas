@@ -1,7 +1,7 @@
 // Tests de los circuitos dibujados a mano: node --test tests/
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { validarTrazado, posicionesSalida, ETAPAS, TW, R } from "../js/circuito.js";
+import { validarTrazado, posicionesSalida, ETAPAS, TW, R } from "../web/js/circuito.js";
 
 // trazo "a mano": puntos cada pocas unidades con algo de temblor
 function dedo(puntosClave, temblor = 3) {

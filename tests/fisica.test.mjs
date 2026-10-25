@@ -1,9 +1,9 @@
 // Tests de la física y de la máquina: node --test tests/
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ETAPAS, construirPista, posicionesSalida, TW, R, WW, WH, PASO } from "../js/circuito.js";
-import { pasoFisica, simular, velocidadTiro, LIM_VALLA, VMAX } from "../js/fisica.js";
-import { elegirTiro } from "../js/ia.js";
+import { ETAPAS, construirPista, posicionesSalida, TW, R, WW, WH, PASO } from "../web/js/circuito.js";
+import { pasoFisica, simular, velocidadTiro, LIM_VALLA, VMAX } from "../web/js/fisica.js";
+import { elegirTiro } from "../web/js/ia.js";
 
 const pistas = ETAPAS.map(construirPista);
 const fijo = () => 0.5;

@@ -1,8 +1,8 @@
 // Tests del fútbol de chapas: node --test tests/
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { CAMPO, RB, crearPartido, colocarSaque, balonDe, pasoFutbol, simularFutbol, elegirTiroFutbol, porteriaRival } from "../js/futbol.js";
-import { velocidadTiro } from "../js/fisica.js";
+import { CAMPO, RB, crearPartido, colocarSaque, balonDe, pasoFutbol, simularFutbol, elegirTiroFutbol, porteriaRival } from "../web/js/futbol.js";
+import { velocidadTiro } from "../web/js/fisica.js";
 
 const dentro = c => c.x > CAMPO.x0 - CAMPO.fondo - 1 && c.x < CAMPO.x1 + CAMPO.fondo + 1 && c.y > CAMPO.y0 - 1 && c.y < CAMPO.y1 + 1;
 

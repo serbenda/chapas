@@ -8,15 +8,16 @@ import { resolve, extname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const raiz = resolve(import.meta.dirname, "..");
-const docs = resolve(raiz, "docs");
+const docs = resolve(raiz, "docs", "img");
+const web = resolve(raiz, "web");
 mkdirSync(docs, { recursive: true });
 
 // servidor local: los módulos JS no cargan desde file://
 const tipos = { ".html": "text/html", ".js": "text/javascript", ".json": "application/json", ".png": "image/png", ".webmanifest": "application/manifest+json", ".css": "text/css" };
 const servidor = createServer((req, res) => {
-  const ruta = join(raiz, decodeURIComponent(new URL(req.url, "http://x").pathname));
+  const ruta = join(web, decodeURIComponent(new URL(req.url, "http://x").pathname));
   const archivo = existsSync(ruta) && statSync(ruta).isDirectory() ? join(ruta, "index.html") : ruta;
-  if (!archivo.startsWith(raiz) || !existsSync(archivo)) { res.writeHead(404); res.end(); return; }
+  if (!archivo.startsWith(web) || !existsSync(archivo)) { res.writeHead(404); res.end(); return; }
   res.writeHead(200, { "Content-Type": tipos[extname(archivo)] || "application/octet-stream" });
   res.end(readFileSync(archivo));
 });

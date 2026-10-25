@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/banner.png" alt="La Vuelta de Chapas" width="100%">
+<img src="docs/img/banner.png" alt="La Vuelta de Chapas" width="100%">
 
 **🇪🇸 Español** · [🇬🇧 English](README.en.md)
 
@@ -28,7 +28,7 @@ Hecho para jugar con mis hijas.
 <table>
 <tr>
 <td width="34%" align="center" valign="top">
-<img src="docs/partida.gif" alt="Partida en el móvil" width="250"><br>
+<img src="docs/img/partida.gif" alt="Partida en el móvil" width="250"><br>
 <sub><b>Una partida en el móvil:</b> la manita enseña el gesto y la máquina juega su turno</sub>
 </td>
 <td width="66%" valign="top">
@@ -53,16 +53,16 @@ Hecho para jugar con mis hijas.
 
 | | |
 | :---: | :---: |
-| <img src="docs/etapa-llana.png" alt="Etapa llana"> | <img src="docs/etapa-montana.png" alt="Etapa de montaña"> |
+| <img src="docs/img/etapa-llana.png" alt="Etapa llana"> | <img src="docs/img/etapa-montana.png" alt="Etapa de montaña"> |
 | **1 · Llana**: para coger el truco | **2 · Montaña**: subidas que frenan, bajadas que lanzan y dos premios de montaña |
-| <img src="docs/etapa-adoquines.png" alt="Etapa de adoquines"> | <img src="docs/etapa-final.png" alt="Gran final"> |
+| <img src="docs/img/etapa-adoquines.png" alt="Etapa de adoquines"> | <img src="docs/img/etapa-final.png" alt="Gran final"> |
 | **3 · Adoquines**: la chapa bota y los charcos la hacen resbalar | **4 · Gran final**: un poco de todo, con la meta en el centro de la espiral |
 
 ## ✏️ Dibuja tu circuito
 
 | Dibujando con el dedo | ¡Circuito listo! |
 | :---: | :---: |
-| <img src="docs/dibujar-trazo.png" alt="Dibujando el circuito"> | <img src="docs/dibujar-listo.png" alt="Circuito dibujado"> |
+| <img src="docs/img/dibujar-trazo.png" alt="Dibujando el circuito"> | <img src="docs/img/dibujar-listo.png" alt="Circuito dibujado"> |
 
 Como en el patio: en la pantalla de corredores pulsa **DIBUJA TU CIRCUITO** y pinta la carretera con el dedo, de la salida a la meta. El juego suaviza el trazo, lo convierte en un circuito de tiza y te avisa si algo no vale:
 
@@ -78,7 +78,7 @@ El circuito se guarda en el móvil y aparece como **5. TU CIRCUITO** para volver
 
 | Partido contra la máquina | ¡Gol! |
 | :---: | :---: |
-| <img src="docs/futbol-partido.png" alt="Partido de fútbol de chapas"> | <img src="docs/futbol-gol.png" alt="Gol"> |
+| <img src="docs/img/futbol-partido.png" alt="Partido de fútbol de chapas"> | <img src="docs/img/futbol-gol.png" alt="Gol"> |
 
 Cada equipo tiene **4 chapas** (portero, dos defensas y un delantero) y se juega por turnos: **eliges una de tus chapas**, la tiras y tiene que golpear el balón. El campo tiene bordillo, así que nada se sale, y gana quien llegue antes a **3 o 5 goles**. Tras cada gol, saca el equipo que lo ha recibido.
 
@@ -86,13 +86,13 @@ Cada equipo tiene **4 chapas** (portero, dos defensas y un delantero) y se juega
 
 | Clasificación general de la Vuelta | Podio de etapa |
 | :---: | :---: |
-| <img src="docs/clasificacion.png" alt="Clasificación general"> | <img src="docs/podio.png" alt="Podio"> |
+| <img src="docs/img/clasificacion.png" alt="Clasificación general"> | <img src="docs/img/podio.png" alt="Podio"> |
 
 ## 📱 En el móvil
 
 | Menú | Corredores | Carrera | Fútbol |
 | :---: | :---: | :---: | :---: |
-| <img src="docs/movil-menu.png" alt="Menú" width="200"> | <img src="docs/movil-corredores.png" alt="Pantalla de corredores" width="200"> | <img src="docs/movil-partida.png" alt="Partida con zoom" width="200"> | <img src="docs/movil-futbol.png" alt="Fútbol en el móvil" width="200"> |
+| <img src="docs/img/movil-menu.png" alt="Menú" width="200"> | <img src="docs/img/movil-corredores.png" alt="Pantalla de corredores" width="200"> | <img src="docs/img/movil-partida.png" alt="Partida con zoom" width="200"> | <img src="docs/img/movil-futbol.png" alt="Fútbol en el móvil" width="200"> |
 | **Ciclismo** o **fútbol**, y para cuántos | Nombre, foto, persona o máquina, y tipo de carrera | La cámara se acerca a la chapa que tira | La cámara sigue al balón |
 
 > Todas las imágenes las genera automáticamente un robot que juega partidas de verdad cada vez que cambia el juego (ver [Capturas automáticas](#-capturas-automáticas)).
@@ -255,30 +255,34 @@ stateDiagram-v2
 
 ```
 chapas/
-├── index.html               # Estructura y estilos
-├── js/
-│   ├── juego.js             # Pantalla, cámara, dibujo, turnos, etapas y menús
-│   ├── circuito.js          # Las 4 etapas, terreno y validación de circuitos dibujados
-│   ├── fisica.js            # Movimiento, choques, vallas y terreno (puro)
-│   ├── ia.js                # La máquina del ciclismo
-│   ├── futbol.js            # Fútbol: campo, balón, goles y su máquina (puro)
-│   └── sonido.js            # Efectos y música de 8 bits
-├── tests/
-│   ├── fisica.test.mjs      # Tests de circuitos, física y máquina
-│   ├── futbol.test.mjs      # Tests del fútbol
-│   └── trazado.test.mjs     # Tests de los circuitos dibujados a mano
-├── manifest.webmanifest     # Datos para instalarlo como app
-├── sw.js                    # Service worker: juego sin internet
-├── docs/                    # Imágenes del README (automáticas)
+├── web/                         # El juego: es lo que se publica en GitHub Pages
+│   ├── index.html               # Estructura y estilos
+│   ├── manifest.webmanifest     # Datos para instalarlo como app
+│   ├── sw.js                    # Service worker: juego sin internet
+│   ├── icons/                   # Iconos de chapa de la app
+│   └── js/
+│       ├── juego.js             # Pantalla, cámara, dibujo, turnos, etapas, menús y editor
+│       ├── circuito.js          # Las 4 etapas, terreno y validación de circuitos dibujados
+│       ├── fisica.js            # Movimiento, choques, vallas y terreno (puro)
+│       ├── ia.js                # La máquina del ciclismo
+│       ├── futbol.js            # Fútbol: campo, balón, goles y su máquina (puro)
+│       └── sonido.js            # Efectos y música de 8 bits
+├── tests/                       # Tests con node:test
+│   ├── fisica.test.mjs          # Circuitos, física y máquina
+│   ├── futbol.test.mjs          # Fútbol
+│   └── trazado.test.mjs         # Circuitos dibujados a mano
 ├── scripts/
-│   ├── capturas.mjs         # Robot que juega y hace las capturas
-│   ├── empaquetar.mjs       # Junta todo en un único HTML
-│   ├── fuentes_locales.py   # Copia las fuentes a la web al publicar
-│   └── banner.html          # Cabecera del README
-└── .github/workflows/
-    ├── tests.yml            # Tests en cada cambio y pull request
-    ├── capturas.yml         # Rehace las imágenes del README
-    └── pages.yml            # Publica el juego en GitHub Pages
+│   ├── capturas.mjs             # Robot que juega y hace las capturas
+│   ├── empaquetar.mjs           # Junta todo en un único HTML
+│   ├── fuentes_locales.py       # Copia las fuentes a la web al publicar
+│   └── banner.html              # Cabecera del README
+├── docs/img/                    # Imágenes del README (automáticas)
+├── .github/workflows/
+│   ├── tests.yml                # Tests en cada cambio y pull request
+│   ├── capturas.yml             # Rehace las imágenes del README
+│   └── pages.yml                # Publica web/ en GitHub Pages
+├── README.md · README.en.md
+└── LICENSE
 ```
 
 ### 💻 Probarlo en local
@@ -286,13 +290,13 @@ chapas/
 ```bash
 git clone https://github.com/serbenda/chapas.git
 cd chapas
-python3 -m http.server 8000      # los módulos no cargan desde file://
+python3 -m http.server 8000 -d web   # los módulos no cargan desde file://
 # abre http://localhost:8000
 
 node --test tests/*.test.mjs     # tests
 ```
 
-> Si cambias el juego, sube la versión en `sw.js` (`chapas-v8` → `chapas-v9`) para que los móviles descarguen la nueva.
+> Si cambias el juego, sube la versión en `web/sw.js` (`chapas-v9` → `chapas-v10`) para que los móviles descarguen la nueva.
 
 ### 🌿 Ramas
 
@@ -303,7 +307,7 @@ node --test tests/*.test.mjs     # tests
 
 ### 🤖 Capturas automáticas
 
-Cada vez que cambia el juego, [GitHub Actions](.github/workflows/capturas.yml) lo abre en un Chromium real con **Playwright**, juega partidas en las cuatro etapas, saca las capturas en tablet y móvil, monta el GIF con **ffmpeg** y lo sube a `docs/`.
+Cada vez que cambia el juego, [GitHub Actions](.github/workflows/capturas.yml) lo abre en un Chromium real con **Playwright**, juega partidas en las cuatro etapas, saca las capturas en tablet y móvil, monta el GIF con **ffmpeg** y lo sube a `docs/img/`.
 
 ## 🗺️ Hoja de ruta
 
