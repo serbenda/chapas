@@ -41,6 +41,7 @@ In 1980s Spain, every schoolyard had the same game: draw a race track on the gro
 - 🛣️ **Leave the road and you go back.** Or play with barriers in easy mode.
 - ⚽ **Two games**: **cycling** and **bottle-cap football**.
 - 🏔️ **4 stages**: flat, mountain, cobblestones and grand finale.
+- ✏️ **Draw your own track** with your finger, like chalk in the schoolyard.
 - 💛 **Yellow and polka-dot jerseys**, with overall standings.
 - 🤖 **Play against the computer**, with 3 levels.
 - 📸 **Your photo inside the cap**, like the old ones.
@@ -58,6 +59,22 @@ In 1980s Spain, every schoolyard had the same game: draw a race track on the gro
 | **1 · Flat**: to get the hang of it | **2 · Mountain**: climbs that slow you down, descents that launch you and two mountain primes |
 | <img src="docs/etapa-adoquines.png" alt="Cobblestone stage"> | <img src="docs/etapa-final.png" alt="Grand finale"> |
 | **3 · Cobblestones**: caps bounce and puddles make them slide | **4 · Grand finale**: a bit of everything, with the finish in the middle of the spiral |
+
+## ✏️ Draw your own track
+
+| Drawing with your finger | Track ready! |
+| :---: | :---: |
+| <img src="docs/dibujar-trazo.png" alt="Drawing a track"> | <img src="docs/dibujar-listo.png" alt="Finished track"> |
+
+Just like in the schoolyard: on the riders screen tap **DIBUJA TU CIRCUITO** (draw your track) and paint the road with your finger, from start to finish. The game smooths the line, turns it into a chalk track and tells you if something doesn't work:
+
+| If… | It says |
+| --- | --- |
+| It's too short | *¡Muy corto!* (Too short! Make it longer) |
+| Two stretches touch | *¡Las carreteras se tocan!* (The roads touch! Move them apart) and circles the spot in red |
+| A bend is impossible | First it tries to smooth it by itself; if it can't, *¡Curva muy cerrada!* (Bend too tight!) |
+
+The track is saved on the device and appears as **5. TU CIRCUITO** to race again, also against the computer.
 
 ## ⚽ Bottle-cap football
 
@@ -168,7 +185,7 @@ The game is designed to comply with the GDPR and Spain's data protection law (LO
 
 | | |
 | --- | --- |
-| **What is stored** | Each cap's name, photo (cropped to 160 × 160 px) and player type, best scores per stage and preferences |
+| **What is stored** | Each cap's name, photo (cropped to 160 × 160 px) and player type, best scores per stage, the track you draw and preferences |
 | **Where** | Only in that phone or tablet's browser `localStorage`. Nothing is sent to any server |
 | **What it doesn't do** | No cookies, no analytics, no ads and no trackers |
 | **Fonts** | When published, the fonts are copied to the game's own site: it makes no requests to Google |
@@ -233,6 +250,7 @@ stateDiagram-v2
 | **Camera** | If a cap would look small, it zooms in and follows it; the background is painted once at zoom resolution and then just cropped |
 | **Sound** | Effects and music synthesised with Web Audio: no audio files |
 | **Football** | Same shooting engine; its own physics with masses (the ball weighs half and rolls further), a kerb with gaps at the goals, posts, and a goal when the ball fully crosses the line |
+| **Hand-drawn tracks** | The stroke is resampled every 50 units and smoothed as many times as needed to remove impossible bends; then it checks the length and that no stretch touches another |
 | **Offline** | A *service worker* caches the game and its modules the first time |
 
 ### 📁 Structure
@@ -242,14 +260,15 @@ chapas/
 ├── index.html               # Markup and styles
 ├── js/
 │   ├── juego.js             # Screen, camera, drawing, turns, stages and menus
-│   ├── circuito.js          # The 4 stages: layout, terrain, summits and puddles
+│   ├── circuito.js          # The 4 stages, terrain and validation of hand-drawn tracks
 │   ├── fisica.js            # Movement, collisions, barriers and terrain (pure)
 │   ├── ia.js                # The cycling computer player
 │   ├── futbol.js            # Football: pitch, ball, goals and its computer player (pure)
 │   └── sonido.js            # Sound effects and 8-bit music
 ├── tests/
 │   ├── fisica.test.mjs      # Track, physics and computer tests
-│   └── futbol.test.mjs      # Football tests
+│   ├── futbol.test.mjs      # Football tests
+│   └── trazado.test.mjs     # Hand-drawn track tests
 ├── manifest.webmanifest     # App install metadata
 ├── sw.js                    # Service worker: offline play
 ├── docs/                    # README images (automatic)
@@ -275,7 +294,7 @@ python3 -m http.server 8000      # modules don't load from file://
 node --test tests/*.test.mjs     # tests
 ```
 
-> If you change the game, bump the version in `sw.js` (`chapas-v7` → `chapas-v8`) so phones download the new one.
+> If you change the game, bump the version in `sw.js` (`chapas-v8` → `chapas-v9`) so phones download the new one.
 
 ### 🌿 Branches
 
@@ -301,6 +320,7 @@ Every time the game changes, [GitHub Actions](.github/workflows/capturas.yml) op
 - [x] Play against the computer, with 3 levels
 - [x] Modular code and automated tests
 - [x] ⚽ Bottle-cap football, against a person or the computer
+- [x] ✏️ Draw your own track with your finger
 - [ ] The game in English too
 
 ## ⚖️ License

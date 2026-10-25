@@ -142,3 +142,71 @@ export function posicionesSalida(pista, n) {
   }
   return out;
 }
+
+// ---------- Circuitos dibujados a mano ----------
+export const LIMITES = { x0: 60, x1: 940, y0: 60, y1: 560 };
+export const LONGITUD_MINIMA = 1300;
+
+function remuestrear(puntos, paso) {
+  const out = [puntos[0]];
+  let resto = 0;
+  for (let i = 1; i < puntos.length; i++) {
+    let [ax, ay] = puntos[i - 1];
+    const [bx, by] = puntos[i];
+    let d = Math.hypot(bx - ax, by - ay);
+    while (resto + d >= paso) {
+      const t = (paso - resto) / d;
+      ax += (bx - ax) * t; ay += (by - ay) * t;
+      out.push([ax, ay]);
+      d = Math.hypot(bx - ax, by - ay);
+      resto = 0;
+    }
+    resto += d;
+  }
+  const ult = puntos[puntos.length - 1], prev = out[out.length - 1];
+  if (Math.hypot(ult[0] - prev[0], ult[1] - prev[1]) > paso * 0.4) out.push(ult);
+  return out;
+}
+
+/**
+ * Comprueba si un trazado hecho con el dedo se puede jugar.
+ * @param puntos [[x, y], ...] en coordenadas del mundo
+ * @returns {{ok:true, etapa, pista} | {ok:false, motivo:"corto"|"cruce"|"curva", donde?:[x,y]}}
+ */
+export function validarTrazado(puntos) {
+  const { x0, x1, y0, y1 } = LIMITES;
+  const limpio = puntos.map(([x, y]) => [Math.max(x0, Math.min(x1, x)), Math.max(y0, Math.min(y1, y))]);
+  let largo = 0;
+  for (let i = 1; i < limpio.length; i++) largo += Math.hypot(limpio[i][0] - limpio[i - 1][0], limpio[i][1] - limpio[i - 1][1]);
+  if (limpio.length < 2 || largo < LONGITUD_MINIMA) return { ok: false, motivo: "corto" };
+  // menos puntos y suavizado: el pulso de un niño tiembla y las esquinas salen en pico.
+  // Se suaviza más mientras quede alguna curva demasiado cerrada.
+  let ctrl = remuestrear(limpio, 50);
+  const suavizar = c => c.map((p, i) => i === 0 || i === c.length - 1 ? p
+    : [(c[i - 1][0] + 2 * p[0] + c[i + 1][0]) / 4, (c[i - 1][1] + 2 * p[1] + c[i + 1][1]) / 4]);
+  let resultado = null;
+  for (let pasada = 0; pasada < 10; pasada++) {
+    ctrl = suavizar(ctrl);
+    if (pasada < 1) continue;
+    resultado = comprobar(ctrl.map(([x, y]) => [Math.round(x), Math.round(y)]));
+    if (resultado.ok || resultado.motivo !== "curva") break;
+  }
+  return resultado;
+}
+
+function comprobar(ctrl) {
+  const etapa = { id: "propio", nombre: "Tu circuito", icono: "propio", ctrl, zonas: [], cimas: [], charcos: [], adorno: null };
+  const pista = construirPista(etapa);
+  const { PX, PY, N } = pista;
+  if (pista.L < LONGITUD_MINIMA * 0.85) return { ok: false, motivo: "corto" };
+  for (let i = 0; i < N; i += 2) for (let j = i + 60; j < N; j += 2) {
+    if (Math.hypot(PX[i] - PX[j], PY[i] - PY[j]) < TW + 16) return { ok: false, motivo: "cruce", donde: [(PX[i] + PX[j]) / 2, (PY[i] + PY[j]) / 2] };
+  }
+  for (let i = 3; i < N - 3; i += 2) {
+    const a = [PX[i - 3], PY[i - 3]], b = [PX[i], PY[i]], c = [PX[i + 3], PY[i + 3]];
+    const ab = Math.hypot(b[0] - a[0], b[1] - a[1]), bc = Math.hypot(c[0] - b[0], c[1] - b[1]), ca = Math.hypot(a[0] - c[0], a[1] - c[1]);
+    const area = Math.abs((b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1])) / 2;
+    if (area > 1e-6 && ab * bc * ca / (4 * area) < TW / 2 + 4) return { ok: false, motivo: "curva", donde: b };
+  }
+  return { ok: true, etapa, pista };
+}

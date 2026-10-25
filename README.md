@@ -39,6 +39,7 @@ Hecho para jugar con mis hijas.
 - 🛣️ **Si te sales, vuelves atrás.** O juega con vallas en el modo fácil.
 - ⚽ **Dos juegos**: **ciclismo** y **fútbol de chapas**.
 - 🏔️ **4 etapas**: llana, montaña, adoquines y gran final.
+- ✏️ **Dibuja tu propio circuito** con el dedo, como con la tiza en el patio.
 - 💛 **Maillot amarillo y de lunares**, con clasificación general.
 - 🤖 **Juega contra la máquina**, que tiene 3 niveles.
 - 📸 **Tu foto dentro de la chapa**, como las de antes.
@@ -56,6 +57,22 @@ Hecho para jugar con mis hijas.
 | **1 · Llana**: para coger el truco | **2 · Montaña**: subidas que frenan, bajadas que lanzan y dos premios de montaña |
 | <img src="docs/etapa-adoquines.png" alt="Etapa de adoquines"> | <img src="docs/etapa-final.png" alt="Gran final"> |
 | **3 · Adoquines**: la chapa bota y los charcos la hacen resbalar | **4 · Gran final**: un poco de todo, con la meta en el centro de la espiral |
+
+## ✏️ Dibuja tu circuito
+
+| Dibujando con el dedo | ¡Circuito listo! |
+| :---: | :---: |
+| <img src="docs/dibujar-trazo.png" alt="Dibujando el circuito"> | <img src="docs/dibujar-listo.png" alt="Circuito dibujado"> |
+
+Como en el patio: en la pantalla de corredores pulsa **DIBUJA TU CIRCUITO** y pinta la carretera con el dedo, de la salida a la meta. El juego suaviza el trazo, lo convierte en un circuito de tiza y te avisa si algo no vale:
+
+| Si… | Te dice |
+| --- | --- |
+| Es demasiado corto | *¡Muy corto! Haz un circuito más largo* |
+| Dos tramos se tocan | *¡Las carreteras se tocan! Sepáralas más* (y marca dónde con un círculo rojo) |
+| Hay una curva imposible | Primero intenta suavizarla solo; si no puede, *¡Curva muy cerrada!* |
+
+El circuito se guarda en el móvil y aparece como **5. TU CIRCUITO** para volver a correrlo, también contra la máquina.
 
 ## ⚽ Fútbol de chapas
 
@@ -166,7 +183,7 @@ El juego está pensado para cumplir el RGPD y la LOPDGDD sin tener que pedir nad
 
 | | |
 | --- | --- |
-| **Qué se guarda** | Nombre, foto (recortada a 160 × 160 px) y tipo de cada chapa, récords por etapa y preferencias |
+| **Qué se guarda** | Nombre, foto (recortada a 160 × 160 px) y tipo de cada chapa, récords por etapa, el circuito que dibujes y preferencias |
 | **Dónde** | Solo en el `localStorage` del navegador de ese móvil o tablet. Nada se envía a ningún servidor |
 | **Qué no hace** | Sin cookies, sin analítica, sin publicidad y sin rastreadores |
 | **Fuentes** | Al publicar, las letras se copian a la propia web: el juego no hace peticiones a Google |
@@ -231,6 +248,7 @@ stateDiagram-v2
 | **Cámara** | Si la chapa se vería pequeña, se acerca y la sigue; el fondo se pinta una vez a la resolución del zoom y luego solo se recorta |
 | **Sonido** | Efectos y música sintetizados con Web Audio: no hay archivos de audio |
 | **Fútbol** | Mismo motor de tiro; física propia con masas (el balón pesa la mitad y rueda más), bordillo con huecos en las porterías, postes y gol cuando el balón cruza entero la línea |
+| **Circuitos dibujados** | El trazo se remuestrea cada 50 unidades y se suaviza tantas veces como haga falta para que no queden curvas imposibles; después se comprueba que tenga longitud suficiente y que ningún tramo toque a otro |
 | **Offline** | Un *service worker* guarda el juego y los módulos la primera vez |
 
 ### 📁 Estructura
@@ -240,14 +258,15 @@ chapas/
 ├── index.html               # Estructura y estilos
 ├── js/
 │   ├── juego.js             # Pantalla, cámara, dibujo, turnos, etapas y menús
-│   ├── circuito.js          # Las 4 etapas: trazado, terreno, cimas y charcos
+│   ├── circuito.js          # Las 4 etapas, terreno y validación de circuitos dibujados
 │   ├── fisica.js            # Movimiento, choques, vallas y terreno (puro)
 │   ├── ia.js                # La máquina del ciclismo
 │   ├── futbol.js            # Fútbol: campo, balón, goles y su máquina (puro)
 │   └── sonido.js            # Efectos y música de 8 bits
 ├── tests/
 │   ├── fisica.test.mjs      # Tests de circuitos, física y máquina
-│   └── futbol.test.mjs      # Tests del fútbol
+│   ├── futbol.test.mjs      # Tests del fútbol
+│   └── trazado.test.mjs     # Tests de los circuitos dibujados a mano
 ├── manifest.webmanifest     # Datos para instalarlo como app
 ├── sw.js                    # Service worker: juego sin internet
 ├── docs/                    # Imágenes del README (automáticas)
@@ -273,7 +292,7 @@ python3 -m http.server 8000      # los módulos no cargan desde file://
 node --test tests/*.test.mjs     # tests
 ```
 
-> Si cambias el juego, sube la versión en `sw.js` (`chapas-v7` → `chapas-v8`) para que los móviles descarguen la nueva.
+> Si cambias el juego, sube la versión en `sw.js` (`chapas-v8` → `chapas-v9`) para que los móviles descarguen la nueva.
 
 ### 🌿 Ramas
 
@@ -299,6 +318,7 @@ Cada vez que cambia el juego, [GitHub Actions](.github/workflows/capturas.yml) l
 - [x] Jugar contra la máquina, con 3 niveles
 - [x] Código en módulos y tests automáticos
 - [x] ⚽ Fútbol de chapas, contra otra persona o contra la máquina
+- [x] ✏️ Dibuja tu propio circuito con el dedo
 - [ ] El juego también en inglés
 
 ## ⚖️ Licencia
