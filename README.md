@@ -2,6 +2,8 @@
 
 <img src="docs/banner.png" alt="La Vuelta de Chapas" width="100%">
 
+**🇪🇸 Español** · [🇬🇧 English](README.en.md)
+
 **Juego de chapas de los 80: la vuelta ciclista por turnos, para jugar en el móvil o la tablet.**<br>
 Hecho para jugar con mis hijas.
 
@@ -38,9 +40,10 @@ Hecho para jugar con mis hijas.
 ## 🎮 Cómo se juega
 
 1. **Elige cuántos corredores** juegan: de 2 a 4, en el mismo móvil o tablet.
-2. **Por turnos**, toca la pantalla, **tira hacia atrás** como un tirachinas y **suelta**.
-3. La flecha indica la dirección y la fuerza: 🟢 suave · 🟡 media · 🔴 a tope.
-4. **Gana la primera chapa que cruce la meta** a cuadros.
+2. **Pon tu nombre y tu foto** en tu chapa (opcional: si no, juegas con tu color).
+3. **Por turnos**, cuando salga el cartel con tu chapa, toca la pantalla, **tira hacia atrás** como un tirachinas y **suelta**.
+4. La flecha indica la dirección y la fuerza: 🟢 suave · 🟡 media · 🔴 a tope.
+5. **Gana la primera chapa que cruce la meta** a cuadros.
 
 ### 📜 Reglas del patio
 
@@ -68,10 +71,13 @@ Un locutor de radio *EN DIRECTO* comenta cada tirada, letra a letra, como en las
 - 🕹️ **Estética de recreativa de los 80**: letras pixeladas, efecto de tele de tubo y música de 8 bits generada en directo con Web Audio.
 - 🖍️ **Circuito de tiza** sobre asfalto, con salida, kilómetros, puerto de 1ª categoría y meta.
 - 🍾 **Chapas fieles a las de verdad**: corona de 21 dientes, maillot de color y dorsal.
+- 📸 **Tu foto dentro de la chapa**, como las de los ciclistas de antes, y tu nombre en el marcador. Se recuerdan para la próxima partida.
+- 📢 **Cartel de turno** a pantalla completa con la chapa girando: siempre se sabe a quién le toca.
+- 🔍 **Cámara con zoom en el móvil**: sigue a la chapa que tira para que se vea grande, y un botón enseña el circuito entero.
 - 📱 **Se adapta a cualquier pantalla**: en vertical, el circuito gira para aprovechar el móvil.
 - 📦 **App instalable (PWA)**: icono propio, pantalla completa y **funciona sin internet**.
 - 🧒 **Pensado para niños de 6 a 8 años**: casi sin texto, botones grandes y sin castigos duros.
-- 🔒 **Sin anuncios, sin cuentas y sin recoger datos.**
+- 🔒 **Sin anuncios, sin cuentas y sin recoger datos.** Las fotos se quedan en el propio móvil y nunca se suben a ningún sitio.
 
 ## 📲 Instalar en el móvil
 
@@ -88,7 +94,8 @@ Todo el juego vive en **un único `index.html`**, sin frameworks ni librerías: 
 ```mermaid
 stateDiagram-v2
     [*] --> Menu
-    Menu --> Apuntar: elegir corredores
+    Menu --> Preparar: elegir corredores
+    Preparar --> Apuntar: nombre y foto → ¡a correr!
     Apuntar --> Rodando: tirar y soltar
     Rodando --> Volviendo: alguna chapa se sale
     Rodando --> Apuntar: todas paradas → siguiente turno
@@ -103,7 +110,9 @@ stateDiagram-v2
 | **Circuito** | Curva *Catmull-Rom* sobre 23 puntos de control, remuestreada cada 6 unidades para medir el avance y detectar salidas |
 | **Física** | Paso fijo a 60 Hz con 4 subpasos, rozamiento del 2,8 % por fotograma y choques elásticos entre chapas |
 | **Salidas** | En cada subpaso se busca el punto más cercano de la carretera en una ventana local (así no hay atajos saltando de un tramo a otro) |
-| **Pantalla** | El mundo mide 1000 × 620 y se escala a la pantalla; en vertical se transpone, y los textos se dibujan aparte para que nunca salgan en espejo |
+| **Pantalla** | El mundo mide 1000 × 620 y se escala a la pantalla; en vertical se transpone, y los textos y las fotos se dibujan aparte para que nunca salgan en espejo |
+| **Cámara** | Si la chapa saldría de menos de 30 px, la cámara se acerca y la sigue con suavizado; el fondo se pinta una vez a la resolución del zoom y luego solo se recorta |
+| **Fotos** | Se recortan en cuadrado a 160 px en JPEG y se guardan en `localStorage`: nunca salen del aparato |
 | **Sonido** | Efectos y música de 8 bits sintetizados con osciladores de Web Audio: no hay archivos de audio |
 | **Offline** | Un *service worker* guarda el juego y las fuentes la primera vez |
 
@@ -133,7 +142,14 @@ python3 -m http.server 8000
 # abre http://localhost:8000
 ```
 
-> Si cambias `index.html`, sube la versión en `sw.js` (`chapas-v2` → `chapas-v3`) para que los móviles descarguen la nueva.
+> Si cambias `index.html`, sube la versión en `sw.js` (`chapas-v3` → `chapas-v4`) para que los móviles descarguen la nueva.
+
+### 🌿 Ramas
+
+| Rama | Para qué |
+| --- | --- |
+| `main` | Versión estable: es la que se publica en [serbenda.github.io/chapas](https://serbenda.github.io/chapas/) |
+| `development` | Donde se prueban las novedades antes de pasar a `main` con un *pull request* |
 
 ### 🤖 Capturas automáticas
 
@@ -144,9 +160,13 @@ Cada vez que cambia el juego, [GitHub Actions](.github/workflows/capturas.yml) a
 - [x] Vuelta ciclista para 2 a 4 jugadores
 - [x] Estilo retro: música de 8 bits, locutor y récord
 - [x] App instalable que funciona sin internet
+- [x] Tu nombre y tu foto en la chapa
+- [x] Cartel de turno y zoom en el móvil
 - [ ] ⚽ Modo fútbol de chapas
+- [ ] Modo fácil para los más pequeños
+- [ ] Vuelta por etapas con maillot amarillo y de la montaña
+- [ ] Jugar contra la máquina
 - [ ] Más circuitos: contrarreloj, alta montaña, circuito urbano
-- [ ] Poner tu nombre y tu foto en la chapa
 - [ ] Obstáculos: charcos, adoquines y bordillos
 
 ## ⚖️ Licencia
