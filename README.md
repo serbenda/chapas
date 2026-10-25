@@ -49,7 +49,7 @@ Hecho para jugar con mis hijas.
 
 | Situación | Qué pasa |
 | --- | --- |
-| La chapa se sale de la carretera | `¡FUERA!` Vuelve a donde estaba antes del tiro |
+| La chapa se sale de la carretera | `¡FUERA!` Vuelve a donde estaba antes del tiro. En **modo fácil** rebota en las vallas |
 | Chocas con otra chapa | La empujas. Si la sacas de la carretera, también vuelve a su sitio |
 | Cruzas la meta | ¡Ganas la etapa! Confeti y fanfarria |
 | Ganas en menos tiros que nadie | `¡NUEVO RÉCORD!` Se guarda en ese aparato |
@@ -72,6 +72,10 @@ Un locutor de radio *EN DIRECTO* comenta cada tirada, letra a letra, como en las
 - 🖍️ **Circuito de tiza** sobre asfalto, con salida, kilómetros, puerto de 1ª categoría y meta.
 - 🍾 **Chapas fieles a las de verdad**: corona de 21 dientes, maillot de color y dorsal.
 - 📸 **Tu foto dentro de la chapa**, como las de los ciclistas de antes, y tu nombre en el marcador. Se recuerdan para la próxima partida.
+- 👆 **Tutorial sin texto**: la primera vez, una mano enseña el gesto de tirar y soltar.
+- 🚧 **Modo fácil con vallas** rojas y blancas: la chapa rebota en vez de salirse. Ideal para los más pequeños.
+- 🏆 **Podio final** con los tres primeros en sus cajones.
+- 📳 **Sonido de chapa de verdad** (un *clac* metálico sintetizado) y **vibración** en los choques en Android.
 - 📢 **Cartel de turno** a pantalla completa con la chapa girando: siempre se sabe a quién le toca.
 - 🔍 **Cámara con zoom en el móvil**: sigue a la chapa que tira para que se vea grande, y un botón enseña el circuito entero.
 - 📱 **Se adapta a cualquier pantalla**: en vertical, el circuito gira para aprovechar el móvil.
@@ -112,6 +116,7 @@ stateDiagram-v2
 | **Salidas** | En cada subpaso se busca el punto más cercano de la carretera en una ventana local (así no hay atajos saltando de un tramo a otro) |
 | **Pantalla** | El mundo mide 1000 × 620 y se escala a la pantalla; en vertical se transpone, y los textos y las fotos se dibujan aparte para que nunca salgan en espejo |
 | **Cámara** | Si la chapa saldría de menos de 30 px, la cámara se acerca y la sigue con suavizado; el fondo se pinta una vez a la resolución del zoom y luego solo se recorta |
+| **Vallas** | En modo fácil, si la chapa llega al borde se recoloca dentro y su velocidad se refleja sobre la normal de la carretera, perdiendo un 30 % |
 | **Fotos** | Se recortan en cuadrado a 160 px en JPEG y se guardan en `localStorage`: nunca salen del aparato |
 | **Sonido** | Efectos y música de 8 bits sintetizados con osciladores de Web Audio: no hay archivos de audio |
 | **Offline** | Un *service worker* guarda el juego y las fuentes la primera vez |
@@ -142,7 +147,7 @@ python3 -m http.server 8000
 # abre http://localhost:8000
 ```
 
-> Si cambias `index.html`, sube la versión en `sw.js` (`chapas-v3` → `chapas-v4`) para que los móviles descarguen la nueva.
+> Si cambias `index.html`, sube la versión en `sw.js` (`chapas-v4` → `chapas-v5`) para que los móviles descarguen la nueva.
 
 ### 🌿 Ramas
 
@@ -163,7 +168,7 @@ Cada vez que cambia el juego, [GitHub Actions](.github/workflows/capturas.yml) a
 - [x] Tu nombre y tu foto en la chapa
 - [x] Cartel de turno y zoom en el móvil
 - [ ] ⚽ Modo fútbol de chapas
-- [ ] Modo fácil para los más pequeños
+- [x] Modo fácil con vallas, tutorial, podio, vibración y sonido de chapa
 - [ ] Vuelta por etapas con maillot amarillo y de la montaña
 - [ ] Jugar contra la máquina
 - [ ] Más circuitos: contrarreloj, alta montaña, circuito urbano
