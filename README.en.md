@@ -4,7 +4,7 @@
 
 [🇪🇸 Español](README.md) · **🇬🇧 English**
 
-**An 80s bottle-cap racing game: a turn-based cycling race to play on your phone or tablet.**<br>
+**80s bottle-cap games: a turn-based cycling race and bottle-cap football, to play on your phone or tablet.**<br>
 Made to play with my daughters.
 
 [![Play now](https://img.shields.io/badge/%E2%96%B6%20PLAY%20NOW-serbenda.github.io%2Fchapas-ffcf3a?style=for-the-badge&labelColor=39404c)](https://serbenda.github.io/chapas/)
@@ -39,6 +39,7 @@ In 1980s Spain, every schoolyard had the same game: draw a race track on the gro
 
 - 👆 **Pull back and let go**, like a slingshot.
 - 🛣️ **Leave the road and you go back.** Or play with barriers in easy mode.
+- ⚽ **Two games**: **cycling** and **bottle-cap football**.
 - 🏔️ **4 stages**: flat, mountain, cobblestones and grand finale.
 - 💛 **Yellow and polka-dot jerseys**, with overall standings.
 - 🤖 **Play against the computer**, with 3 levels.
@@ -58,6 +59,14 @@ In 1980s Spain, every schoolyard had the same game: draw a race track on the gro
 | <img src="docs/etapa-adoquines.png" alt="Cobblestone stage"> | <img src="docs/etapa-final.png" alt="Grand finale"> |
 | **3 · Cobblestones**: caps bounce and puddles make them slide | **4 · Grand finale**: a bit of everything, with the finish in the middle of the spiral |
 
+## ⚽ Bottle-cap football
+
+| Match against the computer | Goal! |
+| :---: | :---: |
+| <img src="docs/futbol-partido.png" alt="Bottle-cap football match"> | <img src="docs/futbol-gol.png" alt="Goal"> |
+
+Each team has **4 caps** (goalkeeper, two defenders and a striker) and players take turns: **pick one of your caps**, flick it and hit the ball. The pitch has a kerb, so nothing goes out, and the first to **3 or 5 goals** wins. After each goal, the team that conceded kicks off.
+
 ## 🏆 Standings and podium
 
 | Overall standings | Stage podium |
@@ -66,16 +75,18 @@ In 1980s Spain, every schoolyard had the same game: draw a race track on the gro
 
 ## 📱 On the phone
 
-| Menu | Riders | Race |
-| :---: | :---: | :---: |
-| <img src="docs/movil-menu.png" alt="Menu" width="230"> | <img src="docs/movil-corredores.png" alt="Riders screen" width="230"> | <img src="docs/movil-partida.png" alt="Race with zoom" width="230"> |
-| For 2, 3 or 4 players, or **1 against the computer** | Name, photo, human or computer, and race type | The camera zooms in on the cap being played |
+| Menu | Riders | Race | Football |
+| :---: | :---: | :---: | :---: |
+| <img src="docs/movil-menu.png" alt="Menu" width="200"> | <img src="docs/movil-corredores.png" alt="Riders screen" width="200"> | <img src="docs/movil-partida.png" alt="Race with zoom" width="200"> | <img src="docs/movil-futbol.png" alt="Football on a phone" width="200"> |
+| **Cycling** or **football**, and how many players | Name, photo, human or computer, and race type | The camera zooms in on the cap being played | The camera follows the ball |
 
 > All images are generated automatically by a bot that plays real races every time the game changes (see [Automatic screenshots](#-automatic-screenshots)).
 
 ## 🎮 How to play
 
-1. **Choose how many riders** are playing: 2 to 4 sharing the same phone or tablet, or 1 against the computer.
+### 🚴 Cycling
+
+1. **Choose CICLISMO** (cycling) in the menu and how many riders are playing: 2 to 4 sharing the same phone or tablet, or 1 against the computer.
 2. **Add your name and photo** to your cap, and choose whether each cap is played by a person or the computer.
 3. **Choose the race**: a single stage or the full **Vuelta**, with 4 stages.
 4. **Take turns**: when the banner shows your cap, touch the screen, **pull back** and **let go**. The arrow shows the power: 🟢 soft · 🟡 medium · 🔴 full.
@@ -92,6 +103,13 @@ In 1980s Spain, every schoolyard had the same game: draw a race track on the gro
 | **Cobblestones** | The cap bounces and drifts a little |
 | **Puddle** 💧 | It slides and spins |
 | You cross the finish line | You win the stage |
+
+### ⚽ Football
+
+1. **Choose FÚTBOL** in the menu: 2 players or 1 against the computer.
+2. Add a name and photo to your team (the photo appears on all 4 caps) and choose how many goals to play to.
+3. On your turn, **touch one of your caps** (your team's caps glow), pull back and let go.
+4. If the ball fully enters the opponent's goal, **goal!**
 
 ### 💛 Points and jerseys (the Vuelta)
 
@@ -112,6 +130,8 @@ The computer doesn't cheat: **it tries dozens of shots with the game's own physi
 | Medium | ~104 | Good |
 | Hard | ~228 | Almost perfect |
 
+In **football**, the computer does the same with each of its 4 caps: it aims to hit the ball from behind in line with your goal, tries several directions and strengths, and picks the play that brings the ball closest to your goal without leaving it near its own.
+
 ## 📻 The commentator
 
 A live radio commentator (*EN DIRECTO*) calls every shot, letter by letter, like old Spanish cycling broadcasts:
@@ -126,6 +146,9 @@ A live radio commentator (*EN DIRECTO*) calls every shot, letter by letter, like
 | On cobblestones | *¡Cómo bota en los adoquines!* | Look at it bounce on the cobbles! |
 | First over a summit | *¡Lucía corona la cima en cabeza!* | Lucía crests the summit first! |
 | You take the lead | *¡Nuevo líder: Rojo!* | New leader: Red! |
+| ⚽ Goal | *¡GOOOOL de Lucía!* · *¡Gol en propia puerta!* | GOOOAL by Lucía! · Own goal! |
+| ⚽ Ball hits the post | *¡Al palo! ¡Uyyy!* | Off the post! Ooh! |
+| ⚽ Missing the ball | *¡Ni rozarlo!* | Didn't even touch it! |
 
 ## ✨ Features
 
@@ -170,11 +193,14 @@ flowchart LR
     juego --> fisica["fisica.js<br/>movement and collisions"]
     juego --> ia["ia.js<br/>the computer"]
     juego --> sonido["sonido.js<br/>sound and music"]
+    juego --> futbol["futbol.js<br/>pitch · ball · computer"]
+    futbol --> fisica
     ia --> fisica
     fisica --> circuito
     tests["tests/ · node:test"] -.-> circuito
     tests -.-> fisica
     tests -.-> ia
+    tests -.-> futbol
 ```
 
 ```mermaid
@@ -206,6 +232,7 @@ stateDiagram-v2
 | **Screen** | The world is 1000 × 620; in portrait it is transposed, and text and photos are drawn separately so they are never mirrored |
 | **Camera** | If a cap would look small, it zooms in and follows it; the background is painted once at zoom resolution and then just cropped |
 | **Sound** | Effects and music synthesised with Web Audio: no audio files |
+| **Football** | Same shooting engine; its own physics with masses (the ball weighs half and rolls further), a kerb with gaps at the goals, posts, and a goal when the ball fully crosses the line |
 | **Offline** | A *service worker* caches the game and its modules the first time |
 
 ### 📁 Structure
@@ -217,10 +244,12 @@ chapas/
 │   ├── juego.js             # Screen, camera, drawing, turns, stages and menus
 │   ├── circuito.js          # The 4 stages: layout, terrain, summits and puddles
 │   ├── fisica.js            # Movement, collisions, barriers and terrain (pure)
-│   ├── ia.js                # The computer
+│   ├── ia.js                # The cycling computer player
+│   ├── futbol.js            # Football: pitch, ball, goals and its computer player (pure)
 │   └── sonido.js            # Sound effects and 8-bit music
 ├── tests/
-│   └── fisica.test.mjs      # Track, physics and computer tests
+│   ├── fisica.test.mjs      # Track, physics and computer tests
+│   └── futbol.test.mjs      # Football tests
 ├── manifest.webmanifest     # App install metadata
 ├── sw.js                    # Service worker: offline play
 ├── docs/                    # README images (automatic)
@@ -246,7 +275,7 @@ python3 -m http.server 8000      # modules don't load from file://
 node --test tests/*.test.mjs     # tests
 ```
 
-> If you change the game, bump the version in `sw.js` (`chapas-v6` → `chapas-v7`) so phones download the new one.
+> If you change the game, bump the version in `sw.js` (`chapas-v7` → `chapas-v8`) so phones download the new one.
 
 ### 🌿 Branches
 
@@ -271,7 +300,7 @@ Every time the game changes, [GitHub Actions](.github/workflows/capturas.yml) op
 - [x] Terrain: climbs, descents, cobblestones and puddles
 - [x] Play against the computer, with 3 levels
 - [x] Modular code and automated tests
-- [ ] ⚽ Bottle-cap football mode
+- [x] ⚽ Bottle-cap football, against a person or the computer
 - [ ] The game in English too
 
 ## ⚖️ License

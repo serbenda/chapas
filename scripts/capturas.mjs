@@ -123,6 +123,49 @@ for (const [i, id] of ["llana", "montana", "adoquines", "final"].entries()) {
   await p.close();
 }
 
+// ---------- Fútbol de chapas ----------
+async function prepararFutbol(p, nombres) {
+  await p.click("#b-juego-futbol");
+  await espera(200);
+  await p.click("#b-jug-maquina");
+  await espera(150);
+  for (let i = 0; i < 2; i++) await p.fill("#nombre-" + i, nombres[i]);
+  await p.click("#b-goles-3");
+}
+{
+  const p = await abrir(1180, 820);
+  await prepararFutbol(p, ["Lucía", ""]);
+  await p.click("#b-correr");
+  for (let r = 0; r < 2; r++) {
+    await esperarFase(p, "apuntar", 0, 40000);
+    await espera(900);
+    await p.evaluate(() => window.__vuelta.tirarAlBalon(0.6));
+  }
+  await esperarFase(p, "maquina", 1, 40000);
+  await espera(1700);
+  await p.screenshot({ path: resolve(docs, "futbol-partido.png") });
+  await esperarFase(p, "apuntar", 0, 40000);
+  await espera(900);
+  // jugada de gol: el delantero, justo detrás del balón y frente a la portería
+  await p.evaluate(() => { window.__vuelta.balonA(860, 272); window.__vuelta.chapaA(3, 815, 272); window.__vuelta.tirarAlBalon(0.6); });
+  await esperarFase(p, "gol", undefined, 8000);
+  await espera(700);
+  await p.screenshot({ path: resolve(docs, "futbol-gol.png") });
+  await p.close();
+}
+{
+  const p = await abrir(390, 844);
+  await prepararFutbol(p, ["Lucía", ""]);
+  await p.click("#b-correr");
+  await esperarFase(p, "apuntar", 0, 40000);
+  await espera(900);
+  await p.evaluate(() => window.__vuelta.tirarAlBalon(0.6));
+  await esperarFase(p, "maquina", 1, 40000);
+  await espera(1700);
+  await p.screenshot({ path: resolve(docs, "movil-futbol.png") });
+  await p.close();
+}
+
 // ---------- Móvil: menú, corredores y GIF de una partida ----------
 {
   const p = await abrir(390, 844);
