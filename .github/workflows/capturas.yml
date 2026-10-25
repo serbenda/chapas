@@ -1,0 +1,45 @@
+name: Capturas del README
+
+# Juega una partida en un navegador real y actualiza las imágenes de docs/
+on:
+  push:
+    branches: [main]
+    paths:
+      - index.html
+      - scripts/**
+      - .github/workflows/capturas.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: capturas
+  cancel-in-progress: true
+
+jobs:
+  capturas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar Playwright y ffmpeg
+        run: |
+          npm install --no-save playwright@1.48.2
+          npx playwright install --with-deps chromium
+          sudo apt-get install -y ffmpeg
+
+      - name: Jugar y hacer capturas
+        run: node scripts/capturas.mjs
+
+      - name: Guardar las imágenes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          git diff --cached --quiet || git commit -m "docs: capturas actualizadas [skip ci]"
+          git push

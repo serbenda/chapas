@@ -1,24 +1,160 @@
-# La Vuelta de Chapas
+<div align="center">
 
-Juego de chapas de los 80: la vuelta ciclista por turnos, para jugar en el móvil o la tablet. Hecho para jugar con mis hijas.
+<img src="docs/banner.png" alt="La Vuelta de Chapas" width="100%">
 
-Funciona en el navegador del móvil, la tablet o el ordenador, y se puede instalar como app y jugar sin internet.
+**Juego de chapas de los 80: la vuelta ciclista por turnos, para jugar en el móvil o la tablet.**<br>
+Hecho para jugar con mis hijas.
 
-## Publicarlo en GitHub Pages
+[![Jugar ahora](https://img.shields.io/badge/%E2%96%B6%20JUGAR%20AHORA-serbenda.github.io%2Fchapas-ffcf3a?style=for-the-badge&labelColor=39404c)](https://serbenda.github.io/chapas/)
 
-1. Crea un repositorio **público** en GitHub, por ejemplo `vuelta-chapas`.
-2. Sube todos los archivos de esta carpeta a la raíz del repo (con el botón *Add file → Upload files* o con `git push`).
-3. En el repo ve a **Settings → Pages**.
-4. En *Build and deployment* elige **Deploy from a branch**, rama **main** y carpeta **/ (root)**. Pulsa *Save*.
-5. Espera uno o dos minutos. El juego queda en `https://TU-USUARIO.github.io/vuelta-chapas/`.
+![HTML5](https://img.shields.io/badge/HTML5-Canvas-e5483a?style=flat-square&logo=html5&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-vanilla-ffcf3a?style=flat-square&logo=javascript&logoColor=black)
+![PWA](https://img.shields.io/badge/PWA-instalable-5a0fc8?style=flat-square&logo=pwa&logoColor=white)
+![Offline](https://img.shields.io/badge/funciona-sin%20internet-35b26a?style=flat-square)
+![Dependencias](https://img.shields.io/badge/dependencias-0-3f7fe6?style=flat-square)
+![Edad](https://img.shields.io/badge/edad-6%2B-c2338a?style=flat-square)
 
-## Instalarlo en el móvil
+</div>
 
-- **Android (Chrome):** abre el enlace, menú ⋮ → *Añadir a pantalla de inicio* o *Instalar aplicación*.
-- **iPhone/iPad (Safari):** abre el enlace, botón Compartir → *Añadir a pantalla de inicio*.
+---
 
-Se abre a pantalla completa con su icono de chapa. Después de abrirlo una vez con conexión, ya funciona sin internet.
+## 🚴 La idea
 
-## Cuando cambies el juego
+¿Te acuerdas de pintar un circuito con tiza en el suelo del patio y pasarte la tarde tirando chapas con la foto de tu ciclista favorito? **La Vuelta de Chapas** recupera ese juego para que lo disfrute una generación nueva, en el móvil o la tablet, con la estética de las recreativas de los 80.
 
-Edita `index.html` y sube en `sw.js` la versión (`chapas-v1` → `chapas-v2`) para que los móviles recojan la versión nueva.
+<div align="center">
+<img src="docs/partida.gif" alt="Partida en el móvil" width="300">
+</div>
+
+## 📸 Capturas
+
+| Tablet | Móvil |
+| :---: | :---: |
+| <img src="docs/juego-tablet.png" alt="Partida en tablet" width="520"> | <img src="docs/juego-movil.png" alt="Partida en móvil" width="220"> |
+| <img src="docs/menu-tablet.png" alt="Menú en tablet" width="520"> | <img src="docs/menu-movil.png" alt="Menú en móvil" width="220"> |
+
+> Las capturas y el GIF los genera automáticamente un robot que juega una partida de verdad cada vez que cambia el juego (ver [Capturas automáticas](#-capturas-automáticas)).
+
+## 🎮 Cómo se juega
+
+1. **Elige cuántos corredores** juegan: de 2 a 4, en el mismo móvil o tablet.
+2. **Por turnos**, toca la pantalla, **tira hacia atrás** como un tirachinas y **suelta**.
+3. La flecha indica la dirección y la fuerza: 🟢 suave · 🟡 media · 🔴 a tope.
+4. **Gana la primera chapa que cruce la meta** a cuadros.
+
+### 📜 Reglas del patio
+
+| Situación | Qué pasa |
+| --- | --- |
+| La chapa se sale de la carretera | `¡FUERA!` Vuelve a donde estaba antes del tiro |
+| Chocas con otra chapa | La empujas. Si la sacas de la carretera, también vuelve a su sitio |
+| Cruzas la meta | ¡Ganas la etapa! Confeti y fanfarria |
+| Ganas en menos tiros que nadie | `¡NUEVO RÉCORD!` Se guarda en ese aparato |
+
+## 📻 El locutor
+
+Un locutor de radio *EN DIRECTO* comenta cada tirada, letra a letra, como en las retransmisiones de antes:
+
+| Cuándo | Qué dice |
+| --- | --- |
+| Tirada larga | *¡Qué demarraje!* · *¡Se escapa! ¡Se escapa!* |
+| Tirada corta | *¡Pájara! Se ha quedado sin fuerzas* |
+| Te sales | *¡Uy, a la cuneta! ¡Vuelta atrás!* |
+| Choque | *¡Chocazo en el pelotón!* |
+| Adelantas a todos | *¡Nuevo líder: Rojo!* |
+
+## ✨ Características
+
+- 🕹️ **Estética de recreativa de los 80**: letras pixeladas, efecto de tele de tubo y música de 8 bits generada en directo con Web Audio.
+- 🖍️ **Circuito de tiza** sobre asfalto, con salida, kilómetros, puerto de 1ª categoría y meta.
+- 🍾 **Chapas fieles a las de verdad**: corona de 21 dientes, maillot de color y dorsal.
+- 📱 **Se adapta a cualquier pantalla**: en vertical, el circuito gira para aprovechar el móvil.
+- 📦 **App instalable (PWA)**: icono propio, pantalla completa y **funciona sin internet**.
+- 🧒 **Pensado para niños de 6 a 8 años**: casi sin texto, botones grandes y sin castigos duros.
+- 🔒 **Sin anuncios, sin cuentas y sin recoger datos.**
+
+## 📲 Instalar en el móvil
+
+| Android (Chrome) | iPhone / iPad (Safari) |
+| --- | --- |
+| Abre [serbenda.github.io/chapas](https://serbenda.github.io/chapas/) → menú **⋮** → **Instalar aplicación** | Abre [serbenda.github.io/chapas](https://serbenda.github.io/chapas/) → **Compartir** → **Añadir a pantalla de inicio** |
+
+Después de abrirlo una vez con conexión, ya se puede jugar sin internet.
+
+## 🛠️ Bajo el capó
+
+Todo el juego vive en **un único `index.html`**, sin frameworks ni librerías: HTML, CSS y JavaScript a pelo dibujando sobre un `<canvas>`.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Menu
+    Menu --> Apuntar: elegir corredores
+    Apuntar --> Rodando: tirar y soltar
+    Rodando --> Volviendo: alguna chapa se sale
+    Rodando --> Apuntar: todas paradas → siguiente turno
+    Volviendo --> Apuntar: chapas de vuelta a su sitio
+    Rodando --> Meta: una chapa cruza la meta
+    Meta --> Apuntar: otra carrera
+    Meta --> Menu
+```
+
+| Pieza | Cómo funciona |
+| --- | --- |
+| **Circuito** | Curva *Catmull-Rom* sobre 23 puntos de control, remuestreada cada 6 unidades para medir el avance y detectar salidas |
+| **Física** | Paso fijo a 60 Hz con 4 subpasos, rozamiento del 2,8 % por fotograma y choques elásticos entre chapas |
+| **Salidas** | En cada subpaso se busca el punto más cercano de la carretera en una ventana local (así no hay atajos saltando de un tramo a otro) |
+| **Pantalla** | El mundo mide 1000 × 620 y se escala a la pantalla; en vertical se transpone, y los textos se dibujan aparte para que nunca salgan en espejo |
+| **Sonido** | Efectos y música de 8 bits sintetizados con osciladores de Web Audio: no hay archivos de audio |
+| **Offline** | Un *service worker* guarda el juego y las fuentes la primera vez |
+
+### 📁 Estructura
+
+```
+chapas/
+├── index.html               # El juego completo
+├── manifest.webmanifest     # Datos para instalarlo como app
+├── sw.js                    # Service worker: juego sin internet
+├── icon-*.png               # Iconos de chapa
+├── docs/                    # Capturas y GIF del README (automáticos)
+├── scripts/
+│   ├── capturas.mjs         # Robot que juega y hace las capturas
+│   └── banner.html          # Cabecera del README
+└── .github/workflows/
+    └── capturas.yml         # Ejecuta el robot en cada cambio
+```
+
+### 💻 Probarlo en local
+
+```bash
+git clone https://github.com/serbenda/chapas.git
+cd chapas
+python3 -m http.server 8000
+# abre http://localhost:8000
+```
+
+> Si cambias `index.html`, sube la versión en `sw.js` (`chapas-v2` → `chapas-v3`) para que los móviles descarguen la nueva.
+
+### 🤖 Capturas automáticas
+
+Cada vez que cambia el juego, [GitHub Actions](.github/workflows/capturas.yml) abre el juego en un Chromium real con **Playwright**, juega una partida, saca las capturas en tablet y móvil, monta el GIF con **ffmpeg** y lo sube a `docs/`. También se puede lanzar a mano desde la pestaña *Actions*.
+
+## 🗺️ Hoja de ruta
+
+- [x] Vuelta ciclista para 2 a 4 jugadores
+- [x] Estilo retro: música de 8 bits, locutor y récord
+- [x] App instalable que funciona sin internet
+- [ ] ⚽ Modo fútbol de chapas
+- [ ] Más circuitos: contrarreloj, alta montaña, circuito urbano
+- [ ] Poner tu nombre y tu foto en la chapa
+- [ ] Obstáculos: charcos, adoquines y bordillos
+
+## ⚖️ Licencia
+
+© 2026 Santiago. **Todos los derechos reservados.** Puedes jugar y ver el código, pero no copiarlo, modificarlo ni redistribuirlo sin permiso. Ver [LICENSE](LICENSE).
+
+Fuentes: *Press Start 2P*, *VT323*, *Gochi Hand* y *Baloo 2*, de Google Fonts, con licencia SIL Open Font License.
+
+<div align="center">
+<br>
+<sub>Hecho con 🖍️ tiza, 🍾 chapas y mucha nostalgia · © 1987 CHAPAS SOFT</sub>
+</div>
