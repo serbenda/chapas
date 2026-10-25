@@ -25,7 +25,7 @@ Made to play with my daughters.
 
 In 1980s Spain, every schoolyard had the same game: draw a race track on the ground with chalk and flick *chapas* (bottle caps with a photo of your favourite cyclist inside) along it, imitating *La Vuelta*, the Spanish grand tour. **La Vuelta de Chapas** brings that game back for a new generation, on phones and tablets, with the look and sound of an 80s arcade machine.
 
-> The game itself is in Spanish, but it is designed to be played with almost no reading.
+> The game is available in **English and Spanish**: it starts in your phone's language and you can switch with **ES / EN** in the menu.
 
 <table>
 <tr>
@@ -46,6 +46,7 @@ In 1980s Spain, every schoolyard had the same game: draw a race track on the gro
 - 🤖 **Play against the computer**, with 3 levels.
 - 📸 **Your photo inside the cap**, like the old ones.
 - 📻 **A commentator** who calls every shot.
+- 🌍 **In English and Spanish**, with an ES / EN switch in the menu.
 
 </td>
 </tr>
@@ -263,6 +264,7 @@ chapas/
 │   ├── sw.js                    # Service worker: offline play
 │   ├── icons/                   # Bottle-cap app icons
 │   └── js/
+│       ├── textos.js            # All texts in Spanish and English
 │       ├── juego.js             # Screen, camera, drawing, turns, stages, menus and editor
 │       ├── circuito.js          # The 4 stages, terrain and hand-drawn track validation
 │       ├── fisica.js            # Movement, collisions, barriers and terrain (pure)
@@ -298,7 +300,7 @@ python3 -m http.server 8000 -d web   # modules don't load from file://
 node --test tests/*.test.mjs     # tests
 ```
 
-> If you change the game, bump the version in `web/sw.js` (`chapas-v9` → `chapas-v10`) so phones download the new one.
+> If you change the game, bump the version in `web/sw.js` (`chapas-v10` → `chapas-v11`) so phones download the new one.
 
 ### 🌿 Branches
 
@@ -325,7 +327,7 @@ Every time the game changes, [GitHub Actions](.github/workflows/capturas.yml) op
 - [x] Modular code and automated tests
 - [x] ⚽ Bottle-cap football, against a person or the computer
 - [x] ✏️ Draw your own track with your finger
-- [ ] The game in English too
+- [x] 🌍 The game in English and Spanish
 
 ## ⚖️ License
 

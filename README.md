@@ -44,6 +44,7 @@ Hecho para jugar con mis hijas.
 - 🤖 **Juega contra la máquina**, que tiene 3 niveles.
 - 📸 **Tu foto dentro de la chapa**, como las de antes.
 - 📻 **Un locutor** que comenta cada tirada.
+- 🌍 **En castellano y en inglés**, con selector ES / EN en el menú.
 
 </td>
 </tr>
@@ -175,6 +176,7 @@ Un locutor de radio *EN DIRECTO* comenta cada tirada, letra a letra, como en las
 - 📢 **Cartel de turno** y **cámara con zoom** en el móvil.
 - 📳 **Sonido de chapa de verdad** y **vibración** en Android.
 - 📦 **App instalable (PWA)** que **funciona sin internet**.
+- 🌍 **Castellano e inglés**: el juego arranca en el idioma del móvil y se cambia con **ES / EN** en el menú. Hasta el locutor habla inglés.
 - 🔒 **Sin anuncios, sin cuentas y sin recoger datos.**
 
 ## 🔒 Privacidad
@@ -261,6 +263,7 @@ chapas/
 │   ├── sw.js                    # Service worker: juego sin internet
 │   ├── icons/                   # Iconos de chapa de la app
 │   └── js/
+│       ├── textos.js            # Todos los textos en castellano e inglés
 │       ├── juego.js             # Pantalla, cámara, dibujo, turnos, etapas, menús y editor
 │       ├── circuito.js          # Las 4 etapas, terreno y validación de circuitos dibujados
 │       ├── fisica.js            # Movimiento, choques, vallas y terreno (puro)
@@ -296,7 +299,7 @@ python3 -m http.server 8000 -d web   # los módulos no cargan desde file://
 node --test tests/*.test.mjs     # tests
 ```
 
-> Si cambias el juego, sube la versión en `web/sw.js` (`chapas-v9` → `chapas-v10`) para que los móviles descarguen la nueva.
+> Si cambias el juego, sube la versión en `web/sw.js` (`chapas-v10` → `chapas-v11`) para que los móviles descarguen la nueva.
 
 ### 🌿 Ramas
 
@@ -323,7 +326,7 @@ Cada vez que cambia el juego, [GitHub Actions](.github/workflows/capturas.yml) l
 - [x] Código en módulos y tests automáticos
 - [x] ⚽ Fútbol de chapas, contra otra persona o contra la máquina
 - [x] ✏️ Dibuja tu propio circuito con el dedo
-- [ ] El juego también en inglés
+- [x] 🌍 El juego en castellano y en inglés
 
 ## ⚖️ Licencia
 
