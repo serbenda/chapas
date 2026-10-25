@@ -4,16 +4,19 @@ import { WW, WH, TW, R, PASO, ETAPAS, construirPista, posicionesSalida, validarT
 import { pasoFisica, velocidadTiro } from "./fisica.js";
 import { elegirTiro, NIVELES } from "./ia.js";
 import { activarAudio, alternarSonido, haySonido, sfx, arrancarMusica } from "./sonido.js";
+import { t, aplicarTextos, getIdioma, setIdioma } from "./textos.js";
 import { CAMPO, RB, POSTES, crearPartido, colocarSaque, balonDe, pasoFutbol, elegirTiroFutbol, porteriaRival } from "./futbol.js";
 
 const $ = id => document.getElementById(id);
 
 const CORREDORES = [
-  { nombre: "Amarillo", color: "#ffcf3a", dorsal: 1 },
-  { nombre: "Rojo", color: "#e5483a", dorsal: 2 },
-  { nombre: "Verde", color: "#35b26a", dorsal: 3 },
-  { nombre: "Azul", color: "#3f7fe6", dorsal: 4 }
+  { clave: "amarillo", color: "#ffcf3a", dorsal: 1 },
+  { clave: "rojo", color: "#e5483a", dorsal: 2 },
+  { clave: "verde", color: "#35b26a", dorsal: 3 },
+  { clave: "azul", color: "#3f7fe6", dorsal: 4 }
 ];
+const colorDe = i => t("color." + CORREDORES[i].clave);
+const nombreEtapa = e => t("etapa." + e.id);
 const PUNTOS_ETAPA = [10, 6, 3, 1];
 const PUNTOS_CIMA = [5, 3, 1];
 const TIPOS = ["persona", "facil", "media", "dificil"];
@@ -188,11 +191,10 @@ function pintarFondo() {
 
   // textos en coordenadas de pantalla (para que no salgan en espejo)
   transfPantalla(c);
-  textoCarretera(c, "SALIDA", pista.arcoSalida + 46, 24, "rgba(244,240,228,0.85)");
-  textoCarretera(c, "META", pista.arcoMeta - 46, 28, "#ffcf3a");
-  const nombres = { subida: "SUBIDA", bajada: "BAJADA", adoquines: "ADOQUINES" };
-  for (const z of pista.zonas) textoCarretera(c, nombres[z.tipo], z.a0 + 40, 17, z.tipo === "subida" ? "#ff8a2a" : z.tipo === "bajada" ? "#4fd6e8" : "rgba(244,240,228,0.8)");
-  for (const cima of pista.cimas) textoCarretera(c, "CIMA " + cima.cat, cima.arco + 24, 17, "#e5483a");
+  textoCarretera(c, t("lienzo.salida"), pista.arcoSalida + 46, 24, "rgba(244,240,228,0.85)");
+  textoCarretera(c, t("lienzo.meta"), pista.arcoMeta - 46, 28, "#ffcf3a");
+  for (const z of pista.zonas) textoCarretera(c, t("lienzo." + z.tipo), z.a0 + 40, 17, z.tipo === "subida" ? "#ff8a2a" : z.tipo === "bajada" ? "#4fd6e8" : "rgba(244,240,228,0.8)");
+  for (const cima of pista.cimas) textoCarretera(c, t("lienzo.cima", { c: cima.cat }), cima.arco + 24, 17, "#e5483a");
   if (pista.etapa.adorno) {
     const a = pista.etapa.adorno;
     const [x, y] = aPantalla(a.x, a.y), k = esc;
@@ -202,7 +204,7 @@ function pintarFondo() {
     c.font = fuenteTiza(22);
     c.textAlign = "center"; c.textBaseline = "middle";
     c.fillStyle = "rgba(244,240,228,0.9)";
-    c.fillText(a.texto, x, y + 26 * k);
+    c.fillText(t("lienzo.puerto"), x, y + 26 * k);
   }
   let km = 1;
   for (let s = 400; s < pista.arcoMeta - 150; s += 400, km++) {
@@ -307,18 +309,18 @@ function comentar() {
   if (!tiro) return;
   const c = chapas[turno], avance = c.arco - tiro.arcoIni, l = lider();
   let f;
-  if (tiro.fueraPropio) f = al(["¡Se ha ido a la cuneta!", "¡Fuera de la carretera!", "¡Uy, a la cuneta! ¡Vuelta atrás!"]);
-  else if (tiro.fueraOtro) f = "¡Ha echado de la carretera a un rival!";
-  else if (tiro.charco && Math.random() < 0.7) f = al(["¡Ha pisado un charco!", "¡Cuidado, que resbala!"]);
-  else if (tiro.adoquines && Math.random() < 0.6) f = al(["¡Cómo bota en los adoquines!", "¡Traca, traca, adoquines!"]);
-  else if (tiro.rebote && Math.random() < 0.6) f = al(["¡Rebote en la valla!", "¡Menos mal que hay vallas!"]);
-  else if (l === c && tiro.lider !== c) f = "¡Nuevo líder: " + c.nombre + "!";
-  else if (tiro.choque) f = al(["¡Chocazo en el pelotón!", "¡Qué golpe de chapa!"]);
-  else if (avance > 300) f = al(["¡Qué demarraje!", "¡Se escapa! ¡Se escapa!", "¡Tirada de campeón!"]);
-  else if (avance < 60 && tiro.subida) f = al(["¡Qué dura es la subida!", "¡Se le atraganta el puerto!"]);
-  else if (avance < 60) f = al(["¡Pájara! Se ha quedado sin fuerzas", "Tirada corta... ¡ánimo!"]);
-  else if (tiro.bajada && avance > 200) f = "¡Baja como un cohete!";
-  else f = al(["¡Buena tirada!", "¡Sigue en carrera!", "¡Va a rueda del grupo!", "¡Bien colocado!"]);
+  if (tiro.fueraPropio) f = t("loc.fuera");
+  else if (tiro.fueraOtro) f = t("loc.fuera.otro");
+  else if (tiro.charco && Math.random() < 0.7) f = t("loc.charco");
+  else if (tiro.adoquines && Math.random() < 0.6) f = t("loc.adoquines");
+  else if (tiro.rebote && Math.random() < 0.6) f = t("loc.rebote");
+  else if (l === c && tiro.lider !== c) f = t("loc.lider", { n: c.nombre });
+  else if (tiro.choque) f = t("loc.choque");
+  else if (avance > 300) f = t("loc.demarraje");
+  else if (avance < 60 && tiro.subida) f = t("loc.subida");
+  else if (avance < 60) f = t("loc.pajara");
+  else if (tiro.bajada && avance > 200) f = t("loc.bajada");
+  else f = t("loc.normal");
   locutor(f);
   tiro = null;
 }
@@ -344,7 +346,7 @@ function tipoDe(i) { return TIPOS.includes(perfiles[i].tipo) ? perfiles[i].tipo 
 function nombreDe(i) {
   const n = perfiles[i] && perfiles[i].nombre;
   if (n && n.trim()) return n.trim();
-  return tipoDe(i) === "persona" ? CORREDORES[i].nombre : "Robo " + CORREDORES[i].nombre;
+  return tipoDe(i) === "persona" ? colorDe(i) : t("robo", { c: colorDe(i) });
 }
 function pintarMiniChapa(el, c) {
   el.style.setProperty("--c", c.color);
@@ -366,7 +368,7 @@ function leerFoto(archivo, alTerminar) {
   };
   lector.readAsDataURL(archivo);
 }
-const textoTipo = t => t === "persona" ? "PERSONA" : "MÁQUINA " + NIVELES[t].nombre;
+const textoTipo = tipo => tipo === "persona" ? t("prep.persona") : t("prep.maquina", { nivel: t("nivel." + tipo) });
 
 // ---------- Preparar la carrera ----------
 let numJug = 2;
@@ -397,17 +399,17 @@ function abrirPreparar(n) {
     const entrada = document.createElement("input");
     entrada.type = "text"; entrada.id = "nombre-" + i; entrada.maxLength = 10;
     entrada.value = (perfiles[i] && perfiles[i].nombre) || "";
-    entrada.setAttribute("aria-label", "Nombre del corredor " + base.dorsal);
+    entrada.setAttribute("aria-label", t("prep.nombre", { n: base.dorsal }));
     entrada.addEventListener("input", () => { perfiles[i].nombre = entrada.value; });
     const archivo = document.createElement("input");
     archivo.type = "file"; archivo.accept = "image/*"; archivo.id = "foto-" + i;
     const acciones = document.createElement("div");
     acciones.className = "acciones";
     const bFoto = document.createElement("button");
-    bFoto.className = "boton-mini"; bFoto.type = "button"; bFoto.textContent = "FOTO";
+    bFoto.className = "boton-mini"; bFoto.type = "button"; bFoto.textContent = t("prep.foto");
     bFoto.addEventListener("click", () => archivo.click());
     const bQuitar = document.createElement("button");
-    bQuitar.className = "boton-mini secundario"; bQuitar.type = "button"; bQuitar.textContent = "QUITAR";
+    bQuitar.className = "boton-mini secundario"; bQuitar.type = "button"; bQuitar.textContent = t("prep.quitar");
     const bTipo = document.createElement("button");
     bTipo.className = "boton-mini tipo"; bTipo.type = "button"; bTipo.id = "tipo-" + i;
     const refrescar = () => {
@@ -416,7 +418,7 @@ function abrirPreparar(n) {
       const t = tipoDe(i);
       bTipo.textContent = textoTipo(t);
       bTipo.classList.toggle("maquina", t !== "persona");
-      entrada.placeholder = nombreDe(i) === (perfiles[i].nombre || "").trim() ? base.nombre : nombreDe(i);
+      entrada.placeholder = nombreDe(i) === (perfiles[i].nombre || "").trim() ? colorDe(i) : nombreDe(i);
     };
     bTipo.addEventListener("click", () => {
       perfiles[i].tipo = TIPOS[(TIPOS.indexOf(tipoDe(i)) + 1) % TIPOS.length];
@@ -435,7 +437,8 @@ function abrirPreparar(n) {
   }
   pintarEleccion();
   const futbol = juegoModo === "futbol";
-  $("preparar-titulo").textContent = futbol ? "EQUIPOS" : "CORREDORES";
+  $("preparar-titulo").textContent = t(futbol ? "prep.equipos" : "prep.corredores");
+  $("b-correr").textContent = t(futbol ? "prep.jugar" : "prep.correr");
   $("fila-goles").hidden = !futbol;
   $("fila-carrera").hidden = futbol;
   $("fila-carretera").hidden = futbol;
@@ -470,21 +473,23 @@ function pintarEleccion() {
     b.setAttribute("aria-pressed", String(i === eleccion.etapa));
   });
   $("etapa-" + IDX_PROPIA).hidden = !etapaPropia;
-  $("b-dibujar").querySelector("span").textContent = etapaPropia ? "REDIBUJAR" : "DIBUJA TU CIRCUITO";
+  $("b-dibujar").querySelector("span").textContent = etapaPropia ? t("prep.redibujar") : t("prep.dibujar");
 }
 function montarEtapas() {
   const caja = $("etapas");
-  [...ETAPAS, { nombre: "Tu circuito", icono: "propio" }].forEach((e, i) => {
+  caja.innerHTML = "";
+  [...ETAPAS, { id: "propio", icono: "propio" }].forEach((e, i) => {
     const b = document.createElement("button");
     b.type = "button"; b.className = "boton-mini etapa"; b.id = "etapa-" + i; b.dataset.i = String(i);
     b.innerHTML = iconoEtapa(e.icono) + "<span></span>";
-    b.querySelector("span").textContent = (i + 1) + ". " + e.nombre.toUpperCase();
+    b.querySelector("span").textContent = (i + 1) + ". " + nombreEtapa(e).toUpperCase();
     b.addEventListener("click", () => { eleccion.etapa = i; guardar("vuelta-carrera", eleccion); pintarEleccion(); });
     caja.appendChild(b);
   });
   const d = document.createElement("button");
   d.type = "button"; d.className = "boton-mini dibujar"; d.id = "b-dibujar";
-  d.innerHTML = iconoEtapa("lapiz") + "<span>DIBUJA TU CIRCUITO</span>";
+  d.innerHTML = iconoEtapa("lapiz") + "<span></span>";
+  d.querySelector("span").textContent = t("prep.dibujar");
   d.addEventListener("click", () => { guardarPerfiles(); abrirEditor(); });
   caja.appendChild(d);
 }
@@ -515,7 +520,7 @@ function mostrarCartel({ chapa, arriba, nombre, dur = 1100 }) {
   cartelTimer = setTimeout(() => el.classList.remove("visible"), dur);
 }
 function cartelTurno(c) {
-  mostrarCartel({ chapa: c, arriba: c.tipo === "persona" ? "TURNO DE" : "PIENSA", nombre: c.nombre.toUpperCase() });
+  mostrarCartel({ chapa: c, arriba: c.tipo === "persona" ? t("cartel.turno") : t("cartel.piensa"), nombre: c.nombre.toUpperCase() });
 }
 
 // ---------- Estado de la carrera ----------
@@ -555,18 +560,12 @@ function empezarEtapa() {
   pintarTurno();
   moverCamara(true);
   const n = carrera.actual + 1;
-  const titulo = carrera.modo === "vuelta" ? "ETAPA " + n + " DE " + carrera.etapas.length : "ETAPA";
-  mostrarCartel({ chapa: null, arriba: titulo, nombre: etapa.nombre.toUpperCase(), dur: 1500 });
+  const titulo = carrera.modo === "vuelta" ? t("cartel.etapa.n", { n, t: carrera.etapas.length }) : t("cartel.etapa");
+  mostrarCartel({ chapa: null, arriba: titulo, nombre: nombreEtapa(etapa).toUpperCase(), dur: 1500 });
   setTimeout(() => { if (fase === "apuntar" && chapas.length) { locutor(frasesSalida(etapa)); empezarTurno(); } }, 1450);
 }
 function frasesSalida(etapa) {
-  return {
-    llana: "¡Arranca la etapa llana! ¡Mucha suerte!",
-    montana: "¡Etapa de montaña! Ojo con las subidas",
-    adoquines: "¡Llegan los adoquines y los charcos!",
-    final: "¡Gran final! Todo se decide hoy",
-    propio: "¡Carrera en tu propio circuito!"
-  }[etapa.id] || "¡Arranca la carrera!";
+  return ["llana", "montana", "adoquines", "final", "propio"].includes(etapa.id) ? t("loc.salida." + etapa.id) : t("loc.salida.otra");
 }
 
 // Maillots: amarillo para el líder de la general, lunares para el rey de la montaña
@@ -588,7 +587,7 @@ function pintarTurno() {
   $("carrera").hidden = false; $("marcador").hidden = true;
   const c = chapas[turno];
   pintarMiniChapa($("turno-chapa"), c);
-  $("turno-texto").textContent = (c.tipo === "persona" ? "Te toca: " : "Piensa: ") + c.nombre;
+  $("turno-texto").textContent = t(c.tipo === "persona" ? "turno.toca" : "turno.piensa", { n: c.nombre });
   $("pista-ayuda").hidden = !(primerTiro && c.tipo === "persona");
   pintarCarrera();
 }
@@ -639,7 +638,7 @@ lienzo.addEventListener("pointerdown", e => {
     trazo = [aMundo(x, y)];
     dibujando = e.pointerId;
     if (validacion) { validacion = null; medir(); }
-    textoEditor("Sigue... ¡y suelta al llegar a la meta!", "");
+    textoEditor(t("ed.sigue"), "");
     try { lienzo.setPointerCapture(e.pointerId); } catch (err) {}
     return;
   }
@@ -713,7 +712,7 @@ function paso() {
   for (const e of ev) {
     if (e.tipo === "meta" && !ganador) ganador = e.c;
     else if (e.tipo === "fuera") {
-      flotantes.push({ t: "¡FUERA!", x: e.c.x, y: e.c.y, vida: 1, color: "#e5483a" });
+      flotantes.push({ t: t("flota.fuera"), x: e.c.x, y: e.c.y, vida: 1, color: "#e5483a" });
       if (tiro) { if (e.c === chapas[turno]) tiro.fueraPropio = true; else tiro.fueraOtro = true; }
       sfx.fuera();
     } else if (e.tipo === "choque") {
@@ -758,7 +757,7 @@ function revisarCimas() {
       if (!pts) continue;
       carrera.montana[c.i] += pts;
       flotantes.push({ t: "+" + pts + " ▲", x: c.x, y: c.y, vida: 1.4, color: "#f4f0e4" });
-      if (pts === PUNTOS_CIMA[0]) { locutor("¡" + c.nombre + " corona la cima en cabeza!"); sfx.cima(); alguno = true; }
+      if (pts === PUNTOS_CIMA[0]) { locutor(t("loc.cima", { n: c.nombre })); sfx.cima(); alguno = true; }
     }
   });
   return alguno;
@@ -776,7 +775,7 @@ function terminarEtapa() {
   revisarCimas();
   pintarCarrera();
   sfx.meta();
-  locutor("¡¡" + ganador.nombre + " gana la etapa!!");
+  locutor(t("loc.etapa", { n: ganador.nombre }));
   for (let i = 0; i < 160; i++) {
     confeti.push({
       x: cw * Math.random(), y: -20 - Math.random() * ch * 0.5,
@@ -798,7 +797,7 @@ function terminarEtapa() {
   const ultima = carrera.actual >= carrera.etapas.length - 1;
   setTimeout(() => {
     if (carrera.modo === "vuelta") mostrarClasificacion(orden, puntosEtapa, ultima);
-    else mostrarFinal(orden, { titulo: "¡GANA " + ganador.nombre.toUpperCase() + "!", sub: "en " + ganador.tiros + (ganador.tiros === 1 ? " tiro" : " tiros"), record: nuevoRecord });
+    else mostrarFinal(orden, { titulo: t("final.gana", { n: ganador.nombre.toUpperCase() }), sub: ganador.tiros === 1 ? t("final.tiro") : t("final.tiros", { n: ganador.tiros }), record: nuevoRecord });
   }, 1600);
 }
 
@@ -813,12 +812,12 @@ function reyMontana() {
 
 function mostrarClasificacion(ordenEtapa, puntosEtapa, ultima) {
   const etapa = pista.etapa;
-  $("clasif-etapa").textContent = "ETAPA " + (carrera.actual + 1) + " · " + etapa.nombre.toUpperCase();
-  $("clasif-titulo").textContent = "¡GANA " + ordenEtapa[0].nombre.toUpperCase() + "!";
+  $("clasif-etapa").textContent = t("clasif.etapa", { n: carrera.actual + 1, e: nombreEtapa(etapa).toUpperCase() });
+  $("clasif-titulo").textContent = t("final.gana", { n: ordenEtapa[0].nombre.toUpperCase() });
   const tabla = $("clasif-tabla");
   tabla.innerHTML = "";
   const cab = document.createElement("tr");
-  ["", "", "CORREDOR", "ETAPA", "TOTAL", ""].forEach(t => { const th = document.createElement("th"); th.textContent = t; cab.appendChild(th); });
+  ["", "", t("clasif.corredor"), t("clasif.etapa.col"), t("clasif.total"), ""].forEach(x => { const th = document.createElement("th"); th.textContent = x; cab.appendChild(th); });
   tabla.appendChild(cab);
   carrera.actual++;   // los maillots ya cuentan la etapa terminada
   const { amarillo, lunares } = portadores();
@@ -832,12 +831,12 @@ function mostrarClasificacion(ordenEtapa, puntosEtapa, ultima) {
     const tdEtapa = document.createElement("td"); tdEtapa.textContent = "+" + puntosEtapa[j.i];
     const tdTotal = document.createElement("td"); tdTotal.textContent = String(carrera.puntos[j.i]); tdTotal.className = "total";
     const tdMaillot = document.createElement("td");
-    if (j.i === amarillo) tdMaillot.appendChild(maillot("amarillo", "Líder de la general"));
-    if (j.i === lunares) tdMaillot.appendChild(maillot("lunares", "Rey de la montaña"));
+    if (j.i === amarillo) tdMaillot.appendChild(maillot("amarillo", t("maillot.amarillo")));
+    if (j.i === lunares) tdMaillot.appendChild(maillot("lunares", t("maillot.lunares")));
     tr.append(tdPos, tdChapa, tdNombre, tdEtapa, tdTotal, tdMaillot);
     tabla.appendChild(tr);
   });
-  $("b-seguir").textContent = ultima ? "VER PODIO" : "SIGUIENTE ETAPA";
+  $("b-seguir").textContent = ultima ? t("clasif.podio") : t("clasif.siguiente");
   $("clasif").hidden = false;
 }
 function maillot(tipo, titulo) {
@@ -851,8 +850,8 @@ function seguirVuelta() {
     const orden = ordenGeneral();
     const rey = reyMontana();
     mostrarFinal(orden, {
-      titulo: "¡" + orden[0].nombre.toUpperCase() + " GANA LA VUELTA!",
-      sub: rey ? "Rey de la montaña: " + rey.nombre : "",
+      titulo: t("final.vuelta", { n: orden[0].nombre.toUpperCase() }),
+      sub: rey ? t("final.rey", { n: rey.nombre }) : "",
       record: false
     });
   } else {
@@ -1105,14 +1104,9 @@ function bucle(t) {
 
 // ---------- Dibuja tu circuito ----------
 let trazo = [], dibujando = null, validacion = null;
-const MENSAJES = {
-  corto: "¡Muy corto! Haz un circuito más largo",
-  cruce: "¡Las carreteras se tocan! Sepáralas más",
-  curva: "¡Curva muy cerrada! Hazla más suave"
-};
-function textoEditor(t, clase) {
+function textoEditor(texto, clase) {
   const p = $("editor-texto");
-  p.textContent = t;
+  p.textContent = texto;
   p.className = clase || "";
 }
 function abrirEditor() {
@@ -1128,13 +1122,13 @@ function abrirEditor() {
     // el último circuito dibujado, listo para correr o redibujar
     pista = construirPista(etapaPropia);
     validacion = { ok: true, etapa: etapaPropia, pista };
-    textoEditor("Tu circuito. ¡A correr, o dibuja otro encima!", "bien");
-  } else textoEditor("Dibuja la carretera con el dedo, de la salida a la meta", "");
+    textoEditor(t("ed.tuyo"), "bien");
+  } else textoEditor(t("ed.inicio"), "");
   $("b-ed-correr").disabled = !validacion;
   $("carrera").hidden = true; $("marcador").hidden = true;
   $("turno-chapa").textContent = "✎"; $("turno-chapa").style.setProperty("--c", "#4fd6e8");
   $("turno-chapa").classList.remove("con-foto"); $("turno-chapa").style.backgroundImage = "";
-  $("turno-texto").textContent = "Dibuja tu circuito";
+  $("turno-texto").textContent = t("ed.hud");
   $("editor").hidden = false;
   medir();
 }
@@ -1144,15 +1138,15 @@ function cerrarEditor() {
   fase = "menu";
 }
 function terminarTrazo() {
-  if (trazo.length < 2) { textoEditor("Dibuja la carretera con el dedo, de la salida a la meta", ""); return; }
+  if (trazo.length < 2) { textoEditor(t("ed.inicio"), ""); return; }
   validacion = validarTrazado(trazo);
   if (validacion.ok) {
     pista = validacion.pista;
-    textoEditor("¡Circuito listo!", "bien");
+    textoEditor(t("ed.listo"), "bien");
     sfx.cima();
     medir();
   } else {
-    textoEditor(MENSAJES[validacion.motivo], "mal");
+    textoEditor(t("ed." + validacion.motivo), "mal");
     sfx.fuera();
   }
   $("b-ed-correr").disabled = !validacion.ok;
@@ -1172,7 +1166,7 @@ function pintarLienzoDibujo() {
   c.font = fuenteTiza(40);
   c.textAlign = "center"; c.textBaseline = "middle";
   c.fillStyle = "rgba(244,240,228,0.16)";
-  c.fillText("DIBUJA AQUÍ", sx, sy);
+  c.fillText(t("lienzo.dibuja"), sx, sy);
 }
 function dibujarTrazo() {
   if (validacion && validacion.ok && !trazo.length) return;   // ya se ve el circuito en el fondo
@@ -1199,7 +1193,7 @@ function dibujarTrazo() {
 }
 $("b-ed-borrar").addEventListener("click", () => {
   trazo = []; validacion = null;
-  textoEditor("Dibuja la carretera con el dedo, de la salida a la meta", "");
+  textoEditor(t("ed.inicio"), "");
   $("b-ed-correr").disabled = true;
   medir();
 });
@@ -1232,11 +1226,11 @@ function iniciarPartido() {
   medir();
   pintarTurno();
   moverCamara(true);
-  mostrarCartel({ chapa: null, arriba: "PARTIDO A " + partido.objetivo + " GOLES", nombre: "¡A JUGAR!", dur: 1500 });
+  mostrarCartel({ chapa: null, arriba: t("cartel.partido", { n: partido.objetivo }), nombre: t("cartel.jugar"), dur: 1500 });
   const este = partido;
   setTimeout(() => {
     if (partido !== este || fase !== "apuntar") return;
-    locutor("¡Empieza el partido! Saca " + jugadores[0].nombre);
+    locutor(t("loc.empieza", { n: jugadores[0].nombre }));
     empezarTurno();
   }, 1450);
 }
@@ -1252,14 +1246,14 @@ function pintarTurnoFutbol() {
   $("carrera").hidden = true; $("marcador").hidden = false;
   const j = jugadores[turno];
   pintarMiniChapa($("turno-chapa"), j);
-  $("turno-texto").textContent = (j.tipo === "persona" ? "Te toca: " : "Piensa: ") + j.nombre;
+  $("turno-texto").textContent = t(j.tipo === "persona" ? "turno.toca" : "turno.piensa", { n: j.nombre });
   $("pista-ayuda").hidden = !(primerTiro && j.tipo === "persona");
   pintarMarcador();
 }
 function empezarTurnoFutbol() {
   const j = jugadores[turno];
   sel = -1;
-  mostrarCartel({ chapa: j, arriba: j.tipo === "persona" ? "TURNO DE" : "PIENSA", nombre: j.nombre.toUpperCase() });
+  mostrarCartel({ chapa: j, arriba: j.tipo === "persona" ? t("cartel.turno") : t("cartel.piensa"), nombre: j.nombre.toUpperCase() });
   pintarTurno();
   if (j.tipo !== "persona") {
     fase = "maquina";
@@ -1298,7 +1292,7 @@ function pasoPartido() {
     } else if (e.tipo === "palo") {
       if (tiro) tiro.palo = true;
       sfx.valla();
-      flotantes.push({ t: "¡PALO!", x: e.c.x, y: e.c.y, vida: 1, color: "#e5483a" });
+      flotantes.push({ t: t("flota.palo"), x: e.c.x, y: e.c.y, vida: 1, color: "#e5483a" });
     } else if (e.tipo === "pared" && e.c.tipo === "balon" && e.fuerza > 1.5 && ahora - ultimoChoque > 80) {
       sfx.valla(); ultimoChoque = ahora;
     }
@@ -1315,12 +1309,12 @@ function comentarFutbol() {
   const b = balonDe(chapas), [gx, gy] = porteriaRival(tiro.equipo);
   const antes = Math.hypot(tiro.balon.x - gx, tiro.balon.y - gy), ahora = Math.hypot(b.x - gx, b.y - gy);
   let f;
-  if (tiro.palo) f = al(["¡Al palo! ¡Uyyy!", "¡El palo lo ha salvado!"]);
-  else if (!tiro.algunToque) f = al(["¡No ha tocado el balón!", "¡Ni rozarlo!"]);
-  else if (ahora < 220) f = al(["¡Peligro en el área!", "¡Casi es gol!"]);
-  else if (antes - ahora > 220) f = al(["¡Qué pase!", "¡Buen toque, avanza el equipo!"]);
-  else if (antes - ahora < -150) f = al(["¡Balón para atrás!", "¡Uy, hacia su propio campo!"]);
-  else f = al(["¡Buen toque!", "¡Sigue el partido!", "¡Tiki-taka de chapas!"]);
+  if (tiro.palo) f = t("loc.palo");
+  else if (!tiro.algunToque) f = t("loc.sintocar");
+  else if (ahora < 220) f = t("loc.peligro");
+  else if (antes - ahora > 220) f = t("loc.pase");
+  else if (antes - ahora < -150) f = t("loc.atras");
+  else f = t("loc.toque");
   locutor(f);
   tiro = null;
 }
@@ -1332,9 +1326,9 @@ function golMarcado(eq) {
   tiro = null;
   const b = balonDe(chapas);
   for (const c of chapas) { c.vx = c.vy = 0; }
-  flotantes.push({ t: "¡GOL!", x: b.x, y: b.y, vida: 2, color: "#ffcf3a" });
+  flotantes.push({ t: t("flota.gol"), x: b.x, y: b.y, vida: 2, color: "#ffcf3a" });
   sfx.meta();
-  locutor(propia ? "¡Gol en propia puerta! Punto para " + jugadores[eq].nombre : "¡GOOOOL de " + jugadores[eq].nombre + "!");
+  locutor(t(propia ? "loc.propia" : "loc.gol", { n: jugadores[eq].nombre }));
   for (let i = 0; i < 90; i++) {
     confeti.push({ x: cw * Math.random(), y: -20 - Math.random() * ch * 0.4, vx: (Math.random() - 0.5) * 2, vy: 2 + Math.random() * 3, c: [jugadores[eq].color, "#f4f0e4"][i % 2] });
   }
@@ -1345,7 +1339,7 @@ function golMarcado(eq) {
       if (partido !== este) return;
       fase = "fin";
       const g = jugadores[eq], o = jugadores[1 - eq];
-      mostrarFinal([g, o], { titulo: "¡GANA " + g.nombre.toUpperCase() + "!", sub: partido.goles[eq] + " - " + partido.goles[1 - eq], record: false });
+      mostrarFinal([g, o], { titulo: t("final.gana", { n: g.nombre.toUpperCase() }), sub: partido.goles[eq] + " - " + partido.goles[1 - eq], record: false });
     }, 2000);
   } else {
     setTimeout(() => {
@@ -1461,17 +1455,15 @@ function montarOpciones() {
   $("b-juego-futbol").classList.toggle("activo", futbol);
   $("b-juego-vuelta").setAttribute("aria-pressed", String(!futbol));
   $("b-juego-futbol").setAttribute("aria-pressed", String(futbol));
-  $("menu-sub").textContent = futbol ? "Elige jugadores" : "Elige corredores";
-  $("menu-instr").textContent = futbol
-    ? "Elige tu chapa, tira hacia atrás y suelta. ¡Mete el balón en la portería rival!"
-    : "Tira de la chapa hacia atrás y suelta. ¡Si te sales, vuelves atrás!";
+  $("menu-sub").textContent = t(futbol ? "menu.sub.futbol" : "menu.sub.vuelta");
+  $("menu-instr").textContent = t(futbol ? "menu.instr.futbol" : "menu.instr.vuelta");
   (futbol ? [2] : [2, 3, 4]).forEach(n => {
     const b = document.createElement("button");
     b.className = "boton";
     b.id = "b-jug-" + n;
     const fila = CORREDORES.slice(0, n).map(c => '<i style="--c:' + c.color + '"></i>').join("");
     b.innerHTML = "<span>" + n + '</span><span class="fila">' + fila + "</span>";
-    b.setAttribute("aria-label", n + (futbol ? " jugadores" : " corredores"));
+    b.setAttribute("aria-label", t(futbol ? "menu.n.jugadores" : "menu.n.corredores", { n }));
     b.addEventListener("click", () => {
       activarAudio();
       if (futbol) { perfiles[0].tipo = "persona"; perfiles[1].tipo = "persona"; }
@@ -1483,7 +1475,7 @@ function montarOpciones() {
   b.className = "boton";
   b.id = "b-jug-maquina";
   b.innerHTML = '<span>1</span><span class="fila"><i style="--c:#ffcf3a"></i><b class="vs">VS</b><i class="robot" style="--c:#e5483a"></i></span>';
-  b.setAttribute("aria-label", "Un jugador contra la máquina");
+  b.setAttribute("aria-label", t("menu.vs"));
   b.addEventListener("click", () => {
     activarAudio();
     perfiles[0].tipo = "persona";
@@ -1511,6 +1503,30 @@ function pintarGoles() {
 }
 [3, 5].forEach(n => $("b-goles-" + n).addEventListener("click", () => { golesObjetivo = n; guardar("vuelta-goles", n); pintarGoles(); }));
 montarEtapas();
+
+// ---------- Idioma ----------
+function pintarIdioma() {
+  ["es", "en"].forEach(l => {
+    $("b-idioma-" + l).classList.toggle("activo", getIdioma() === l);
+    $("b-idioma-" + l).setAttribute("aria-pressed", String(getIdioma() === l));
+  });
+  $("b-vista").setAttribute("aria-label", t(verTodo ? "hud.seguir" : "hud.vista"));
+}
+function ponerIdioma(l) {
+  if (l === getIdioma()) return;
+  setIdioma(l);
+  aplicarTextos();
+  pintarIdioma();
+  montarOpciones();
+  montarEtapas();
+  pintarEleccion();
+  medir();   // los textos pintados en el suelo
+}
+$("b-idioma-es").addEventListener("click", () => ponerIdioma("es"));
+$("b-idioma-en").addEventListener("click", () => ponerIdioma("en"));
+aplicarTextos();
+pintarIdioma();
+montarOpciones();
 $("b-una").addEventListener("click", () => { eleccion.modo = "etapa"; guardar("vuelta-carrera", eleccion); pintarEleccion(); });
 $("b-vuelta").addEventListener("click", () => { eleccion.modo = "vuelta"; guardar("vuelta-carrera", eleccion); pintarEleccion(); });
 $("b-correr").addEventListener("click", () => { activarAudio(); iniciarCarrera(); });
@@ -1560,7 +1576,7 @@ $("b-vista").addEventListener("click", () => {
   verTodo = !verTodo;
   $("vista-fuera").hidden = verTodo;
   $("vista-dentro").hidden = !verTodo;
-  $("b-vista").setAttribute("aria-label", verTodo ? "Seguir a la chapa" : "Ver todo el circuito");
+  $("b-vista").setAttribute("aria-label", t(verTodo ? "hud.seguir" : "hud.vista"));
 });
 $("b-otra").addEventListener("click", () => { activarAudio(); iniciarCarrera(); });
 $("b-menu").addEventListener("click", irAlMenu);

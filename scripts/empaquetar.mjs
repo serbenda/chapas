@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const raiz = resolve(import.meta.dirname, "..");
-const orden = ["circuito", "fisica", "ia", "futbol", "sonido", "juego"];   // dependencias primero
+const orden = ["textos", "circuito", "fisica", "ia", "futbol", "sonido", "juego"];   // dependencias primero
 
 const codigo = orden.map(m => {
   let fuente = readFileSync(resolve(raiz, "web", "js", m + ".js"), "utf8");

@@ -3,7 +3,7 @@ name: Capturas del README
 # Juega una partida en un navegador real y actualiza las imágenes de docs/
 on:
   push:
-    branches: [main, development]
+    branches: [development]   # main está protegida: las capturas llegan con el pull request
     paths:
       - web/**
       - scripts/**

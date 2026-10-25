@@ -127,3 +127,15 @@ for (const p of pistas) {
     assert.ok(sim.chapas[0].arco - c.arco > 120, "debería avanzar bastante");
   });
 }
+
+test("los textos existen en castellano y en inglés", async () => {
+  const { TEXTOS } = await import("../web/js/textos.js");
+  const es = Object.keys(TEXTOS.es).sort(), en = Object.keys(TEXTOS.en).sort();
+  assert.deepEqual(en, es, "faltan claves en algún idioma");
+  for (const k of es) {
+    const a = TEXTOS.es[k], b = TEXTOS.en[k];
+    assert.equal(Array.isArray(a), Array.isArray(b), k);
+    const vars = x => [...String(x).matchAll(/\{(\w+)\}/g)].map(m => m[1]).sort().join();
+    assert.equal(vars(a), vars(b), "variables distintas en " + k);
+  }
+});
