@@ -4,7 +4,7 @@
 
 **🇪🇸 Español** · [🇬🇧 English](README.en.md)
 
-**Juego de chapas de los 80: la vuelta ciclista por turnos, para jugar en el móvil o la tablet.**<br>
+**Juego de chapas de los 80: la vuelta ciclista y el fútbol de chapas, por turnos, para jugar en el móvil o la tablet.**<br>
 Hecho para jugar con mis hijas.
 
 [![Jugar ahora](https://img.shields.io/badge/%E2%96%B6%20JUGAR%20AHORA-serbenda.github.io%2Fchapas-ffcf3a?style=for-the-badge&labelColor=39404c)](https://serbenda.github.io/chapas/)
@@ -37,6 +37,7 @@ Hecho para jugar con mis hijas.
 
 - 👆 **Tira hacia atrás y suelta**, como un tirachinas.
 - 🛣️ **Si te sales, vuelves atrás.** O juega con vallas en el modo fácil.
+- ⚽ **Dos juegos**: **ciclismo** y **fútbol de chapas**.
 - 🏔️ **4 etapas**: llana, montaña, adoquines y gran final.
 - 💛 **Maillot amarillo y de lunares**, con clasificación general.
 - 🤖 **Juega contra la máquina**, que tiene 3 niveles.
@@ -56,6 +57,14 @@ Hecho para jugar con mis hijas.
 | <img src="docs/etapa-adoquines.png" alt="Etapa de adoquines"> | <img src="docs/etapa-final.png" alt="Gran final"> |
 | **3 · Adoquines**: la chapa bota y los charcos la hacen resbalar | **4 · Gran final**: un poco de todo, con la meta en el centro de la espiral |
 
+## ⚽ Fútbol de chapas
+
+| Partido contra la máquina | ¡Gol! |
+| :---: | :---: |
+| <img src="docs/futbol-partido.png" alt="Partido de fútbol de chapas"> | <img src="docs/futbol-gol.png" alt="Gol"> |
+
+Cada equipo tiene **4 chapas** (portero, dos defensas y un delantero) y se juega por turnos: **eliges una de tus chapas**, la tiras y tiene que golpear el balón. El campo tiene bordillo, así que nada se sale, y gana quien llegue antes a **3 o 5 goles**. Tras cada gol, saca el equipo que lo ha recibido.
+
 ## 🏆 Clasificación y podio
 
 | Clasificación general de la Vuelta | Podio de etapa |
@@ -64,16 +73,18 @@ Hecho para jugar con mis hijas.
 
 ## 📱 En el móvil
 
-| Menú | Corredores | Carrera |
-| :---: | :---: | :---: |
-| <img src="docs/movil-menu.png" alt="Menú" width="230"> | <img src="docs/movil-corredores.png" alt="Pantalla de corredores" width="230"> | <img src="docs/movil-partida.png" alt="Partida con zoom" width="230"> |
-| Para 2, 3 o 4 jugadores, o **1 contra la máquina** | Nombre, foto, persona o máquina, y tipo de carrera | La cámara se acerca a la chapa que tira |
+| Menú | Corredores | Carrera | Fútbol |
+| :---: | :---: | :---: | :---: |
+| <img src="docs/movil-menu.png" alt="Menú" width="200"> | <img src="docs/movil-corredores.png" alt="Pantalla de corredores" width="200"> | <img src="docs/movil-partida.png" alt="Partida con zoom" width="200"> | <img src="docs/movil-futbol.png" alt="Fútbol en el móvil" width="200"> |
+| **Ciclismo** o **fútbol**, y para cuántos | Nombre, foto, persona o máquina, y tipo de carrera | La cámara se acerca a la chapa que tira | La cámara sigue al balón |
 
 > Todas las imágenes las genera automáticamente un robot que juega partidas de verdad cada vez que cambia el juego (ver [Capturas automáticas](#-capturas-automáticas)).
 
 ## 🎮 Cómo se juega
 
-1. **Elige cuántos corredores** juegan: de 2 a 4 en el mismo móvil o tablet, o 1 contra la máquina.
+### 🚴 Ciclismo
+
+1. **Elige CICLISMO** en el menú y cuántos corredores juegan: de 2 a 4 en el mismo móvil o tablet, o 1 contra la máquina.
 2. **Pon tu nombre y tu foto** en tu chapa, y elige si cada chapa la lleva una persona o la máquina.
 3. **Elige la carrera**: una etapa suelta o **La Vuelta** completa, de 4 etapas.
 4. **Por turnos**, cuando salga el cartel con tu chapa, toca la pantalla, **tira hacia atrás** y **suelta**. La flecha indica la fuerza: 🟢 suave · 🟡 media · 🔴 a tope.
@@ -90,6 +101,13 @@ Hecho para jugar con mis hijas.
 | **Adoquines** | La chapa bota y se desvía un poco |
 | **Charco** 💧 | Resbala y se va girando |
 | Cruzas la meta | Ganas la etapa |
+
+### ⚽ Fútbol
+
+1. **Elige FÚTBOL** en el menú: 2 jugadores o 1 contra la máquina.
+2. Pon nombre y foto a tu equipo (la foto sale en tus 4 chapas) y elige a cuántos goles se juega.
+3. En tu turno, **toca una de tus chapas** (brillan las de tu equipo), tira hacia atrás y suelta.
+4. Si el balón entra entero en la portería rival, **¡gol!**
 
 ### 💛 Puntos y maillots (La Vuelta)
 
@@ -110,6 +128,8 @@ La máquina no hace trampas: **prueba decenas de tiros con la misma física del 
 | Media | ~104 | Buena |
 | Difícil | ~228 | Casi perfecta |
 
+La máquina del **fútbol** hace lo mismo con cada una de sus 4 chapas: apunta para golpear el balón por detrás en línea con tu portería, prueba varias direcciones y fuerzas, y elige la jugada que más acerca el balón a tu portería sin dejarlo cerca de la suya.
+
 ## 📻 El locutor
 
 Un locutor de radio *EN DIRECTO* comenta cada tirada, letra a letra, como en las retransmisiones de antes:
@@ -124,6 +144,9 @@ Un locutor de radio *EN DIRECTO* comenta cada tirada, letra a letra, como en las
 | En los adoquines | *¡Cómo bota en los adoquines!* |
 | Coronas una cima | *¡Lucía corona la cima en cabeza!* |
 | Adelantas a todos | *¡Nuevo líder: Rojo!* |
+| ⚽ Gol | *¡GOOOOL de Lucía!* · *¡Gol en propia puerta!* |
+| ⚽ Balón al poste | *¡Al palo! ¡Uyyy!* |
+| ⚽ Sin tocar el balón | *¡Ni rozarlo!* |
 
 ## ✨ Características
 
@@ -168,11 +191,14 @@ flowchart LR
     juego --> fisica["fisica.js<br/>movimiento y choques"]
     juego --> ia["ia.js<br/>la máquina"]
     juego --> sonido["sonido.js<br/>efectos y música"]
+    juego --> futbol["futbol.js<br/>campo · balón · máquina"]
+    futbol --> fisica
     ia --> fisica
     fisica --> circuito
     tests["tests/ · node:test"] -.-> circuito
     tests -.-> fisica
     tests -.-> ia
+    tests -.-> futbol
 ```
 
 ```mermaid
@@ -204,6 +230,7 @@ stateDiagram-v2
 | **Pantalla** | El mundo mide 1000 × 620; en vertical se transpone, y los textos y fotos se dibujan aparte para que nunca salgan en espejo |
 | **Cámara** | Si la chapa se vería pequeña, se acerca y la sigue; el fondo se pinta una vez a la resolución del zoom y luego solo se recorta |
 | **Sonido** | Efectos y música sintetizados con Web Audio: no hay archivos de audio |
+| **Fútbol** | Mismo motor de tiro; física propia con masas (el balón pesa la mitad y rueda más), bordillo con huecos en las porterías, postes y gol cuando el balón cruza entero la línea |
 | **Offline** | Un *service worker* guarda el juego y los módulos la primera vez |
 
 ### 📁 Estructura
@@ -215,10 +242,12 @@ chapas/
 │   ├── juego.js             # Pantalla, cámara, dibujo, turnos, etapas y menús
 │   ├── circuito.js          # Las 4 etapas: trazado, terreno, cimas y charcos
 │   ├── fisica.js            # Movimiento, choques, vallas y terreno (puro)
-│   ├── ia.js                # La máquina
+│   ├── ia.js                # La máquina del ciclismo
+│   ├── futbol.js            # Fútbol: campo, balón, goles y su máquina (puro)
 │   └── sonido.js            # Efectos y música de 8 bits
 ├── tests/
-│   └── fisica.test.mjs      # Tests de circuitos, física y máquina
+│   ├── fisica.test.mjs      # Tests de circuitos, física y máquina
+│   └── futbol.test.mjs      # Tests del fútbol
 ├── manifest.webmanifest     # Datos para instalarlo como app
 ├── sw.js                    # Service worker: juego sin internet
 ├── docs/                    # Imágenes del README (automáticas)
@@ -244,7 +273,7 @@ python3 -m http.server 8000      # los módulos no cargan desde file://
 node --test tests/*.test.mjs     # tests
 ```
 
-> Si cambias el juego, sube la versión en `sw.js` (`chapas-v6` → `chapas-v7`) para que los móviles descarguen la nueva.
+> Si cambias el juego, sube la versión en `sw.js` (`chapas-v7` → `chapas-v8`) para que los móviles descarguen la nueva.
 
 ### 🌿 Ramas
 
@@ -269,7 +298,7 @@ Cada vez que cambia el juego, [GitHub Actions](.github/workflows/capturas.yml) l
 - [x] Terreno: subidas, bajadas, adoquines y charcos
 - [x] Jugar contra la máquina, con 3 niveles
 - [x] Código en módulos y tests automáticos
-- [ ] ⚽ Modo fútbol de chapas
+- [x] ⚽ Fútbol de chapas, contra otra persona o contra la máquina
 - [ ] El juego también en inglés
 
 ## ⚖️ Licencia

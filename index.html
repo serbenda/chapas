@@ -285,6 +285,13 @@ body::after {
   border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; box-shadow: 0 3px 0 #b9b3a3;
 }
 .boton-mini.activo { background: var(--ocaso-1); box-shadow: 0 3px 0 #b8901a; }
+.juegos { display: flex; gap: 12px; justify-content: center; }
+.boton-mini.juego { display: inline-flex; align-items: center; gap: 8px; font-size: .8rem; padding: 10px 16px; background: transparent; color: var(--tiza); box-shadow: inset 0 0 0 2px rgba(244, 240, 228, 0.35); }
+.boton-mini.juego.activo { background: var(--ocaso-1); color: #1d1f24; box-shadow: 0 3px 0 #b8901a; }
+#marcador { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 12px; font-family: var(--f-arcade); font-size: 1.4rem; color: var(--tiza); }
+.modo .boton-mini { min-width: 2.6em; }
+#marcador b { font-weight: 400; color: var(--ocaso-1); text-shadow: 0 0 8px rgba(255, 207, 58, 0.45); min-width: 1.2em; text-align: center; }
+#marcador .mini-chapa { width: 32px; height: 32px; font-size: .8rem; }
 .etapas { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .boton-mini.etapa { display: inline-flex; align-items: center; gap: 6px; }
 .boton-mini.tipo { background: transparent; color: var(--tiza); box-shadow: inset 0 0 0 2px rgba(244, 240, 228, 0.3); }
@@ -327,6 +334,8 @@ body::after {
 @media (max-width: 560px) {
   #turno span { display: none; }
   #locutor { font-size: 1.35rem; }
+  #marcador { gap: 8px; font-size: 1.1rem; }
+  #marcador .mini-chapa { width: 22px; height: 22px; font-size: .6rem; }
   #pista-ayuda { font-size: 1.4rem; }
   #hud { gap: 10px; }
   .boton-icono { width: 42px; height: 42px; }
@@ -342,6 +351,7 @@ body::after {
   <div id="hud">
     <div id="turno"><div class="mini-chapa" id="turno-chapa">1</div><span id="turno-texto">¡Te toca!</span></div>
     <div id="carrera" aria-label="Posiciones de la carrera"><div class="meta-mini"></div></div>
+    <div id="marcador" hidden aria-live="polite"><div class="mini-chapa" id="m-chapa-0"></div><b id="goles-0">0</b><span>-</span><b id="goles-1">0</b><div class="mini-chapa" id="m-chapa-1"></div></div>
     <button class="boton-icono" id="b-vista" aria-label="Ver todo el circuito" hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path id="vista-fuera" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path id="vista-dentro" d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" hidden/></svg>
     </button>
@@ -365,11 +375,15 @@ body::after {
       <h1 class="titulo">LA VUELTA<span class="chapas">DE CHAPAS</span></h1>
       <div class="rayas" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </div>
-    <p class="sub parpadea">Elige corredores</p>
+    <div class="juegos" role="group" aria-label="Juego">
+      <button class="boton-mini juego" type="button" id="b-juego-vuelta"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="17" r="3.5"/><circle cx="18" cy="17" r="3.5"/><path d="M6 17l4-8h5l3 8M10 9l-2-3h-2M15 9l1-3h2"/></svg>CICLISMO</button>
+      <button class="boton-mini juego" type="button" id="b-juego-futbol"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8l3.5 2.5-1.3 4h-4.4l-1.3-4z"/><path d="M12 3v5M20.5 9.5l-5 1M17 19l-2.8-4.5M7 19l2.8-4.5M3.5 9.5l5 1"/></svg>FÚTBOL</button>
+    </div>
+    <p class="sub parpadea" id="menu-sub">Elige corredores</p>
     <div class="opciones" id="opciones"></div>
     <div class="instruccion">
       <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="17" cy="7" r="3.5"/><path d="M14.5 9.5L5 19"/><path d="M5 19l1-5M5 19l5-1"/></svg>
-      Tira de la chapa hacia atrás y suelta. ¡Si te sales, vuelves atrás!
+      <span id="menu-instr">Tira de la chapa hacia atrás y suelta. ¡Si te sales, vuelves atrás!</span>
     </div>
     <div class="creditos">RÉCORD <b id="record">--</b> TIROS<br>© 1987 CHAPAS SOFT · <button class="enlace" type="button" id="b-priv-menu">PRIVACIDAD</button></div>
   </div>
@@ -379,15 +393,19 @@ body::after {
 
 <div class="capa" id="preparar" hidden>
   <div class="tarjeta">
-    <h2 class="titulo" style="font-size: clamp(1.3rem, 5vw, 2.2rem)">CORREDORES</h2>
+    <h2 class="titulo" style="font-size: clamp(1.3rem, 5vw, 2.2rem)" id="preparar-titulo">CORREDORES</h2>
     <p class="sub">Pon tu nombre y tu foto</p>
     <div class="fichas" id="fichas"></div>
-    <div class="modo">Carrera:
+    <div class="modo" id="fila-goles" hidden>Goles para ganar:
+      <button class="boton-mini" type="button" id="b-goles-3">3</button>
+      <button class="boton-mini" type="button" id="b-goles-5">5</button>
+    </div>
+    <div class="modo" id="fila-carrera">Carrera:
       <button class="boton-mini" type="button" id="b-una">UNA ETAPA</button>
       <button class="boton-mini" type="button" id="b-vuelta">LA VUELTA · 4 ETAPAS</button>
     </div>
     <div class="etapas" id="etapas"></div>
-    <div class="modo">Carretera:
+    <div class="modo" id="fila-carretera">Carretera:
       <button class="boton-mini" type="button" id="b-normal">NORMAL</button>
       <button class="boton-mini" type="button" id="b-facil">FÁCIL CON VALLAS</button>
     </div>
