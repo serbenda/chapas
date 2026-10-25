@@ -1,6 +1,6 @@
 // Guarda el juego en el móvil para poder jugar sin internet.
 // Sube el número de versión cada vez que cambies index.html.
-const VERSION = "chapas-v7";
+const VERSION = "chapas-v8";
 const ARCHIVOS = ["./", "index.html", "js/juego.js", "js/circuito.js", "js/fisica.js", "js/ia.js", "js/futbol.js", "js/sonido.js", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png"];
 
 self.addEventListener("install", e => {

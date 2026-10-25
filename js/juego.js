@@ -1,6 +1,6 @@
 // La Vuelta de Chapas: pantalla, cámara, dibujo, turnos, etapas y menús.
 
-import { WW, WH, TW, R, PASO, ETAPAS, construirPista, posicionesSalida } from "./circuito.js";
+import { WW, WH, TW, R, PASO, ETAPAS, construirPista, posicionesSalida, validarTrazado, LIMITES } from "./circuito.js";
 import { pasoFisica, velocidadTiro } from "./fisica.js";
 import { elegirTiro, NIVELES } from "./ia.js";
 import { activarAudio, alternarSonido, haySonido, sfx, arrancarMusica } from "./sonido.js";
@@ -69,6 +69,7 @@ function medir() {
   moverCamara(true);
 }
 function objetivoCamara() {
+  if (fase === "dibujar") return { esc: escFit, cx: WW / 2, cy: WH / 2 };
   if (juegoModo === "futbol") return objetivoCamaraFutbol();
   const sigue = hayZoom && !verTodo && chapas.length && (fase === "apuntar" || fase === "maquina" || fase === "rodando" || fase === "volviendo");
   if (!sigue) return { esc: escFit, cx: WW / 2, cy: WH / 2 };
@@ -127,6 +128,7 @@ function pintarAsfalto(c) {
   }
 }
 function pintarFondo() {
+  if (fase === "dibujar" && !(validacion && validacion.ok)) { pintarLienzoDibujo(); return; }
   if (juegoModo === "futbol") { pintarCampo(); return; }
   const { PX, PY, NX, NY, N } = pista;
   const c = fctx;
@@ -371,7 +373,16 @@ let numJug = 2;
 let modoFacil = leer("vuelta-facil", false) === true || leer("vuelta-facil", null) === 1;
 let eleccion = leer("vuelta-carrera", { modo: "etapa", etapa: 0 });
 if (!eleccion || !["etapa", "vuelta"].includes(eleccion.modo)) eleccion = { modo: "etapa", etapa: 0 };
-eleccion.etapa = Math.max(0, Math.min(ETAPAS.length - 1, eleccion.etapa | 0));
+// circuito dibujado a mano (se guarda solo en este dispositivo)
+function etapaConCtrl(ctrl) { return { id: "propio", nombre: "Tu circuito", icono: "propio", ctrl, zonas: [], cimas: [], charcos: [], adorno: null }; }
+let etapaPropia = null;
+{
+  const ctrl = leer("vuelta-circuito", null);
+  if (Array.isArray(ctrl) && ctrl.length > 3) etapaPropia = etapaConCtrl(ctrl);
+}
+const IDX_PROPIA = ETAPAS.length;
+const etapaDe = i => i === IDX_PROPIA && etapaPropia ? etapaPropia : ETAPAS[Math.min(i, ETAPAS.length - 1)];
+eleccion.etapa = Math.max(0, Math.min(etapaPropia ? IDX_PROPIA : ETAPAS.length - 1, eleccion.etapa | 0));
 
 function abrirPreparar(n) {
   numJug = n;
@@ -453,28 +464,38 @@ function pintarEleccion() {
   $("b-una").setAttribute("aria-pressed", String(eleccion.modo === "etapa"));
   $("b-vuelta").setAttribute("aria-pressed", String(eleccion.modo === "vuelta"));
   $("etapas").hidden = eleccion.modo !== "etapa";
-  $("etapas").querySelectorAll("button").forEach((b, i) => {
+  $("etapas").querySelectorAll("button.etapa").forEach(b => {
+    const i = Number(b.dataset.i);
     b.classList.toggle("activo", i === eleccion.etapa);
     b.setAttribute("aria-pressed", String(i === eleccion.etapa));
   });
+  $("etapa-" + IDX_PROPIA).hidden = !etapaPropia;
+  $("b-dibujar").querySelector("span").textContent = etapaPropia ? "REDIBUJAR" : "DIBUJA TU CIRCUITO";
 }
 function montarEtapas() {
   const caja = $("etapas");
-  ETAPAS.forEach((e, i) => {
+  [...ETAPAS, { nombre: "Tu circuito", icono: "propio" }].forEach((e, i) => {
     const b = document.createElement("button");
-    b.type = "button"; b.className = "boton-mini etapa"; b.id = "etapa-" + i;
+    b.type = "button"; b.className = "boton-mini etapa"; b.id = "etapa-" + i; b.dataset.i = String(i);
     b.innerHTML = iconoEtapa(e.icono) + "<span></span>";
     b.querySelector("span").textContent = (i + 1) + ". " + e.nombre.toUpperCase();
     b.addEventListener("click", () => { eleccion.etapa = i; guardar("vuelta-carrera", eleccion); pintarEleccion(); });
     caja.appendChild(b);
   });
+  const d = document.createElement("button");
+  d.type = "button"; d.className = "boton-mini dibujar"; d.id = "b-dibujar";
+  d.innerHTML = iconoEtapa("lapiz") + "<span>DIBUJA TU CIRCUITO</span>";
+  d.addEventListener("click", () => { guardarPerfiles(); abrirEditor(); });
+  caja.appendChild(d);
 }
 function iconoEtapa(tipo) {
   const p = {
     llana: '<path d="M2 15h20"/><circle cx="7" cy="12" r="2.5"/><circle cx="17" cy="12" r="2.5"/>',
     montana: '<path d="M2 19l7-12 4 6 3-4 6 10z"/>',
     adoquines: '<rect x="3" y="5" width="7" height="5" rx="1"/><rect x="14" y="5" width="7" height="5" rx="1"/><rect x="8" y="14" width="8" height="5" rx="1"/>',
-    final: '<path d="M5 21V4"/><path d="M5 4h13l-3 4 3 4H5"/>'
+    final: '<path d="M5 21V4"/><path d="M5 4h13l-3 4 3 4H5"/>',
+    propio: '<path d="M3 17c4-8 7 4 11-4s5-6 7-6"/><circle cx="3" cy="17" r="1.5"/><circle cx="21" cy="7" r="1.5"/>',
+    lapiz: '<path d="M4 20l1-5L16 4l4 4L9 19z"/><path d="M14 6l4 4"/>'
   }[tipo];
   return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">' + p + "</svg>";
 }
@@ -520,7 +541,7 @@ function iniciarCarrera() {
 }
 
 function empezarEtapa() {
-  const etapa = ETAPAS[carrera.etapas[carrera.actual]];
+  const etapa = etapaDe(carrera.etapas[carrera.actual]);
   pista = construirPista(etapa);
   pasadasCima = pista.cimas.map(() => 0);
   const salida = posicionesSalida(pista, jugadores.length);
@@ -543,8 +564,9 @@ function frasesSalida(etapa) {
     llana: "¡Arranca la etapa llana! ¡Mucha suerte!",
     montana: "¡Etapa de montaña! Ojo con las subidas",
     adoquines: "¡Llegan los adoquines y los charcos!",
-    final: "¡Gran final! Todo se decide hoy"
-  }[etapa.id];
+    final: "¡Gran final! Todo se decide hoy",
+    propio: "¡Carrera en tu propio circuito!"
+  }[etapa.id] || "¡Arranca la carrera!";
 }
 
 // Maillots: amarillo para el líder de la general, lunares para el rey de la montaña
@@ -612,6 +634,15 @@ function potencia() {
 function posPuntero(e) { const r = lienzo.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
 lienzo.addEventListener("pointerdown", e => {
   activarAudio();
+  if (fase === "dibujar") {
+    const [x, y] = posPuntero(e);
+    trazo = [aMundo(x, y)];
+    dibujando = e.pointerId;
+    if (validacion) { validacion = null; medir(); }
+    textoEditor("Sigue... ¡y suelta al llegar a la meta!", "");
+    try { lienzo.setPointerCapture(e.pointerId); } catch (err) {}
+    return;
+  }
   if (fase !== "apuntar" || performance.now() < cartelHasta) return;
   const [x, y] = posPuntero(e);
   if (juegoModo === "futbol") {
@@ -630,11 +661,17 @@ lienzo.addEventListener("pointerdown", e => {
   try { lienzo.setPointerCapture(e.pointerId); } catch (err) {}
 });
 lienzo.addEventListener("pointermove", e => {
+  if (fase === "dibujar" && dibujando === e.pointerId) {
+    const [x, y] = posPuntero(e), p = aMundo(x, y), u = trazo[trazo.length - 1];
+    if (Math.hypot(p[0] - u[0], p[1] - u[1]) > 6) trazo.push(p);
+    return;
+  }
   if (!apunte || e.pointerId !== apunte.id) return;
   const [x, y] = posPuntero(e);
   apunte.cx = x; apunte.cy = y;
 });
 lienzo.addEventListener("pointerup", e => {
+  if (fase === "dibujar" && dibujando === e.pointerId) { dibujando = null; terminarTrazo(); return; }
   if (!apunte || e.pointerId !== apunte.id) return;
   const { p, dx, dy } = potencia();
   apunte = null;
@@ -986,6 +1023,7 @@ function dibujar() {
   ctx.fillRect(0, 0, cw, ch);
   const f = esc / escFondo;
   ctx.drawImage(fondo, ox - MARGEN * esc, oy - MARGEN * esc, fondoW * f, fondoH * f);
+  if (fase === "dibujar") { dibujarTrazo(); return; }
   if (!chapas.length) return;
   if (juegoModo === "futbol") { dibujarPartido(); return; }
   transfMundo(ctx);
@@ -1064,6 +1102,118 @@ function bucle(t) {
   dibujar();
   requestAnimationFrame(bucle);
 }
+
+// ---------- Dibuja tu circuito ----------
+let trazo = [], dibujando = null, validacion = null;
+const MENSAJES = {
+  corto: "¡Muy corto! Haz un circuito más largo",
+  cruce: "¡Las carreteras se tocan! Sepáralas más",
+  curva: "¡Curva muy cerrada! Hazla más suave"
+};
+function textoEditor(t, clase) {
+  const p = $("editor-texto");
+  p.textContent = t;
+  p.className = clase || "";
+}
+function abrirEditor() {
+  juegoModo = "vuelta";
+  ["menu", "preparar", "final", "clasif", "privacidad"].forEach(id => { $(id).hidden = true; });
+  $("locutor").hidden = true;
+  $("pista-ayuda").hidden = true;
+  chapas = []; carrera = null; tiroMaquina = null; flotantes = []; confeti = [];
+  fase = "dibujar";
+  trazo = [];
+  validacion = null;
+  if (etapaPropia) {
+    // el último circuito dibujado, listo para correr o redibujar
+    pista = construirPista(etapaPropia);
+    validacion = { ok: true, etapa: etapaPropia, pista };
+    textoEditor("Tu circuito. ¡A correr, o dibuja otro encima!", "bien");
+  } else textoEditor("Dibuja la carretera con el dedo, de la salida a la meta", "");
+  $("b-ed-correr").disabled = !validacion;
+  $("carrera").hidden = true; $("marcador").hidden = true;
+  $("turno-chapa").textContent = "✎"; $("turno-chapa").style.setProperty("--c", "#4fd6e8");
+  $("turno-chapa").classList.remove("con-foto"); $("turno-chapa").style.backgroundImage = "";
+  $("turno-texto").textContent = "Dibuja tu circuito";
+  $("editor").hidden = false;
+  medir();
+}
+function cerrarEditor() {
+  $("editor").hidden = true;
+  dibujando = null;
+  fase = "menu";
+}
+function terminarTrazo() {
+  if (trazo.length < 2) { textoEditor("Dibuja la carretera con el dedo, de la salida a la meta", ""); return; }
+  validacion = validarTrazado(trazo);
+  if (validacion.ok) {
+    pista = validacion.pista;
+    textoEditor("¡Circuito listo!", "bien");
+    sfx.cima();
+    medir();
+  } else {
+    textoEditor(MENSAJES[validacion.motivo], "mal");
+    sfx.fuera();
+  }
+  $("b-ed-correr").disabled = !validacion.ok;
+}
+function pintarLienzoDibujo() {
+  const c = fctx;
+  pintarAsfalto(c);
+  transfMundo(c);
+  const { x0, x1, y0, y1 } = LIMITES;
+  c.save();
+  c.setLineDash([10, 12]);
+  c.strokeStyle = "rgba(244,240,228,0.25)"; c.lineWidth = 3;
+  c.strokeRect(x0 - TW / 2, y0 - TW / 2, x1 - x0 + TW, y1 - y0 + TW);
+  c.restore();
+  transfPantalla(c);
+  const [sx, sy] = aPantalla(WW / 2, WH / 2 - 40);
+  c.font = fuenteTiza(40);
+  c.textAlign = "center"; c.textBaseline = "middle";
+  c.fillStyle = "rgba(244,240,228,0.16)";
+  c.fillText("DIBUJA AQUÍ", sx, sy);
+}
+function dibujarTrazo() {
+  if (validacion && validacion.ok && !trazo.length) return;   // ya se ve el circuito en el fondo
+  if (validacion && validacion.ok) return;
+  transfMundo(ctx);
+  if (trazo.length > 1) {
+    ctx.save();
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    ctx.beginPath();
+    trazo.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+    ctx.strokeStyle = "rgba(244,240,228,0.12)"; ctx.lineWidth = TW; ctx.stroke();
+    ctx.strokeStyle = "rgba(244,240,228,0.85)"; ctx.lineWidth = 3; ctx.setLineDash([8, 8]); ctx.stroke();
+    ctx.restore();
+    const [ax, ay] = trazo[0], [bx, by] = trazo[trazo.length - 1];
+    ctx.fillStyle = "#35b26a"; ctx.beginPath(); ctx.arc(ax, ay, 12, 0, 6.283); ctx.fill();
+    ctx.fillStyle = "#ffcf3a"; ctx.beginPath(); ctx.arc(bx, by, 10, 0, 6.283); ctx.fill();
+  }
+  if (validacion && !validacion.ok && validacion.donde) {
+    const [x, y] = validacion.donde, t = performance.now() / 250;
+    ctx.strokeStyle = "#e5483a"; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.arc(x, y, 40 + 6 * Math.sin(t), 0, 6.283); ctx.stroke();
+  }
+  transfPantalla(ctx);
+}
+$("b-ed-borrar").addEventListener("click", () => {
+  trazo = []; validacion = null;
+  textoEditor("Dibuja la carretera con el dedo, de la salida a la meta", "");
+  $("b-ed-correr").disabled = true;
+  medir();
+});
+$("b-ed-volver").addEventListener("click", () => { cerrarEditor(); medir(); abrirPreparar(numJug); });
+$("b-ed-correr").addEventListener("click", () => {
+  if (!validacion || !validacion.ok) return;
+  activarAudio();
+  etapaPropia = validacion.etapa;
+  guardar("vuelta-circuito", etapaPropia.ctrl);
+  eleccion = { modo: "etapa", etapa: IDX_PROPIA };
+  guardar("vuelta-carrera", eleccion);
+  cerrarEditor();
+  iniciarCarrera();
+});
 
 // ---------- Fútbol de chapas ----------
 function iniciarPartido() {
@@ -1390,6 +1540,7 @@ $("b-priv-borrar").addEventListener("click", () => {
     Object.keys(localStorage).filter(k => k.startsWith("vuelta-")).forEach(k => localStorage.removeItem(k));
   } catch (e) {}
   perfiles = [{}, {}, {}, {}];
+  etapaPropia = null;
   imagenes.length = 0;
   eleccion = { modo: "etapa", etapa: 0 };
   golesObjetivo = 3;
@@ -1450,6 +1601,7 @@ window.__vuelta = {
     return true;
   },
   balonA(x, y) { const b = balonDe(chapas); b.x = x; b.y = y; },
+  abrirEditor: () => { guardarPerfiles(); abrirEditor(); },
   chapaA(i, x, y) { chapas[i].x = x; chapas[i].y = y; },
   // tiro recto por la carretera, sin depender de la pantalla
   tirarRecto(p) {
