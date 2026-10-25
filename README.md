@@ -120,7 +120,8 @@ chapas/
 │   ├── capturas.mjs         # Robot que juega y hace las capturas
 │   └── banner.html          # Cabecera del README
 └── .github/workflows/
-    └── capturas.yml         # Ejecuta el robot en cada cambio
+    ├── capturas.yml         # Ejecuta el robot en cada cambio
+    └── pages.yml            # Publica el juego en GitHub Pages
 ```
 
 ### 💻 Probarlo en local
