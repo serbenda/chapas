@@ -51,7 +51,7 @@ In 1980s Spain, every schoolyard had the same game: draw a race track on the gro
 
 | What happens | Result |
 | --- | --- |
-| Your cap leaves the road | `¡FUERA!` (Out!) It goes back to where it was before the shot |
+| Your cap leaves the road | `¡FUERA!` (Out!) It goes back to where it was before the shot. In **easy mode** it bounces off the barriers |
 | You hit another cap | You push it. If it leaves the road, it goes back to its spot too |
 | You cross the finish line | You win the stage! Confetti and fanfare |
 | You win in fewer shots than ever | `¡NUEVO RÉCORD!` (New record!) Saved on that device |
@@ -74,12 +74,29 @@ A live radio commentator (*EN DIRECTO*) calls every shot, letter by letter, like
 - 🖍️ **Chalk race track** on asphalt, with start line, kilometre marks, a first-category mountain pass and finish line.
 - 🍾 **Caps just like the real ones**: 21-tooth crown, coloured jersey and race number.
 - 📸 **Your photo inside the cap**, like the cyclist caps of old, and your name on the scoreboard. They are remembered for the next race.
+- 👆 **Text-free tutorial**: the first time, a hand shows the pull-and-release gesture.
+- 🚧 **Easy mode with red-and-white barriers**: caps bounce instead of leaving the road. Perfect for the youngest.
+- 🏆 **Final podium** with the top three on their steps.
+- 📳 **Real bottle-cap sound** (a synthesised metallic *clack*) and **vibration** on collisions on Android.
 - 📢 **Full-screen turn banner** with a spinning cap: everyone always knows whose turn it is.
 - 🔍 **Zoom camera on phones**: it follows the cap being played so it looks big, and a button shows the whole track.
 - 📱 **Fits any screen**: in portrait, the track rotates to make the most of the phone.
 - 📦 **Installable app (PWA)**: own icon, full screen and **works offline**.
 - 🧒 **Designed for 6 to 8 year olds**: hardly any text, big buttons and no harsh penalties.
 - 🔒 **No ads, no accounts and no data collection.** Photos stay on the device and are never uploaded.
+
+## 🔒 Privacy
+
+The game is designed to comply with the GDPR and Spain's data protection law (LOPDGDD) without asking anyone for anything: **it never processes personal data outside the device itself**.
+
+| | |
+| --- | --- |
+| **What is stored** | Each cap's name and photo (cropped to 160 × 160 px), the high score and the game mode |
+| **Where** | Only in that phone or tablet's browser `localStorage`. Nothing is sent to any server |
+| **What it doesn't do** | No cookies, no analytics, no ads and no trackers |
+| **Fonts** | When published, the fonts are copied to the game's own site, so it makes no requests to Google and never sends them the player's IP address |
+| **Photos of children** | The game reminds players to only add a child's photo with their parents' or guardians' permission |
+| **Deleting** | **QUITAR** (Remove) button on each photo, or **BORRAR MIS DATOS** (Delete my data) on the *Privacidad* screen |
 
 ## 📲 Install on your phone
 
@@ -114,6 +131,7 @@ stateDiagram-v2
 | **Leaving the road** | Each substep looks for the nearest point of the road within a local window, so there are no shortcuts jumping from one stretch to another |
 | **Screen** | The world is 1000 × 620 units and is scaled to the screen; in portrait it is transposed, and text and photos are drawn separately so they are never mirrored |
 | **Camera** | If a cap would be smaller than 30 px, the camera zooms in and follows it smoothly; the background is painted once at zoom resolution and then just cropped |
+| **Barriers** | In easy mode, when a cap reaches the edge it is pushed back inside and its velocity is reflected across the road normal, losing 30 % |
 | **Photos** | Cropped to a 160 px square JPEG and stored in `localStorage`: they never leave the device |
 | **Sound** | Effects and 8-bit music synthesised with Web Audio oscillators: no audio files |
 | **Offline** | A *service worker* caches the game and the fonts the first time |
@@ -144,7 +162,7 @@ python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
-> If you change `index.html`, bump the version in `sw.js` (`chapas-v3` → `chapas-v4`) so phones download the new one.
+> If you change `index.html`, bump the version in `sw.js` (`chapas-v5` → `chapas-v6`) so phones download the new one.
 
 ### 🌿 Branches
 
@@ -165,7 +183,7 @@ Every time the game changes, [GitHub Actions](.github/workflows/capturas.yml) op
 - [x] Your name and photo on the cap
 - [x] Turn banner and zoom on phones
 - [ ] ⚽ Bottle-cap football mode
-- [ ] Easy mode for the youngest
+- [x] Easy mode with barriers, tutorial, podium, vibration and cap sound
 - [ ] Multi-stage race with yellow and mountain jerseys
 - [ ] Play against the computer
 - [ ] More tracks: time trial, high mountains, city circuit

@@ -166,7 +166,7 @@ body::after {
 .capa {
   position: fixed; inset: 0;
   background: rgba(30, 34, 42, 0.86);
-  display: grid; place-items: center;
+  display: grid; place-items: center; place-items: safe center;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 20px;
@@ -224,6 +224,19 @@ body::after {
 .boton .fila { display: flex; gap: 4px; }
 .boton .fila i { width: 18px; height: 18px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 2px #9aa0aa; }
 .boton.amarillo { background: var(--maillot); box-shadow: 0 5px 0 #b8901a; }
+.podio { display: flex; align-items: flex-end; justify-content: center; gap: 10px; }
+.podio .puesto { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 112px; }
+.podio .puesto .mini-chapa { width: 62px; height: 62px; font-size: 1.4rem; }
+.podio .puesto.primero .mini-chapa { width: 92px; height: 92px; font-size: 2rem; animation: giro 1.2s ease-out; }
+.podio .nombre { font-family: var(--f-lcd); font-size: 1.2rem; text-transform: uppercase; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.podio .cajon {
+  width: 100%; display: grid; place-items: center;
+  font-family: var(--f-arcade); font-size: 1.3rem; color: #1d1f24;
+  border-radius: 6px 6px 0 0; box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.18);
+}
+.podio .primero .cajon { height: 96px; background: var(--ocaso-1); }
+.podio .segundo .cajon { height: 66px; background: #c9ced6; }
+.podio .tercero .cajon { height: 44px; background: #d08a4e; }
 .ganador-chapa { width: 120px; height: 120px; font-size: 2.6rem; box-shadow: 0 0 0 6px #9aa0aa, 0 8px 18px var(--sombra); animation: giro 1.2s ease-out; }
 @keyframes giro { from { transform: rotate(-360deg) scale(.2); } }
 .instruccion { display: flex; align-items: center; gap: 10px; font-family: var(--f-lcd); font-size: 1.5rem; color: var(--tiza-suave); text-align: left; }
@@ -270,11 +283,28 @@ body::after {
   font-family: var(--f-arcade); font-size: .6rem; color: #1d1f24; background: var(--tiza);
   border: none; border-radius: 8px; padding: 8px 10px; cursor: pointer; box-shadow: 0 3px 0 #b9b3a3;
 }
+.boton-mini.activo { background: var(--ocaso-1); box-shadow: 0 3px 0 #b8901a; }
+.modo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; font-family: var(--f-lcd); font-size: 1.5rem; color: var(--tiza-suave); text-transform: uppercase; }
 .boton-mini.secundario { background: transparent; color: var(--tiza-suave); box-shadow: inset 0 0 0 2px rgba(244, 240, 228, 0.3); }
 .boton-mini:focus-visible { outline: 3px solid var(--maillot); outline-offset: 2px; }
 .ficha input[type=file] { display: none; }
 #preparar .tarjeta { max-width: 600px; width: 100%; }
-#preparar { overflow-y: auto; }
+#preparar, #privacidad { overflow-y: auto; }
+.aviso {
+  margin: 0; max-width: 520px; display: flex; gap: 10px; align-items: flex-start; text-align: left;
+  font-family: var(--f-lcd); font-size: 1.25rem; line-height: 1.15; color: var(--tiza-suave);
+  border: 2px dashed rgba(79, 214, 232, 0.45); border-radius: 10px; padding: 8px 12px;
+}
+.aviso svg { flex: none; margin-top: 2px; color: var(--cian); }
+.enlace {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font: inherit; color: var(--cian); text-decoration: underline; text-underline-offset: 3px;
+}
+.enlace:focus-visible { outline: 3px solid var(--maillot); outline-offset: 2px; }
+.legal { text-align: left; max-width: 62ch; display: grid; gap: 12px; font-family: var(--f-ui); font-size: 1rem; line-height: 1.5; color: var(--tiza); }
+.legal h3 { margin: 6px 0 0; font-family: var(--f-arcade); font-weight: 400; font-size: .8rem; color: var(--ocaso-1); line-height: 1.5; }
+.legal p, .legal ul { margin: 0; }
+.legal ul { padding-left: 1.2em; display: grid; gap: 4px; }
 @media (max-width: 560px) {
   #turno span { display: none; }
   #locutor { font-size: 1.35rem; }
@@ -322,7 +352,7 @@ body::after {
       <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="17" cy="7" r="3.5"/><path d="M14.5 9.5L5 19"/><path d="M5 19l1-5M5 19l5-1"/></svg>
       Tira de la chapa hacia atrás y suelta. ¡Si te sales, vuelves atrás!
     </div>
-    <div class="creditos">RÉCORD <b id="record">--</b> TIROS<br>© 1987 CHAPAS SOFT</div>
+    <div class="creditos">RÉCORD <b id="record">--</b> TIROS<br>© 1987 CHAPAS SOFT · <button class="enlace" type="button" id="b-priv-menu">PRIVACIDAD</button></div>
   </div>
 </div>
 
@@ -333,6 +363,14 @@ body::after {
     <h2 class="titulo" style="font-size: clamp(1.3rem, 5vw, 2.2rem)">CORREDORES</h2>
     <p class="sub">Pon tu nombre y tu foto</p>
     <div class="fichas" id="fichas"></div>
+    <div class="modo">Carretera:
+      <button class="boton-mini" type="button" id="b-normal">NORMAL</button>
+      <button class="boton-mini" type="button" id="b-facil">FÁCIL CON VALLAS</button>
+    </div>
+    <p class="aviso">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      <span>Las fotos y los nombres se guardan solo en este dispositivo y no se envían a ningún sitio. Si pones la foto de un niño, que sea con permiso de sus padres. <button class="enlace" type="button" id="b-priv-preparar">Más información</button></span>
+    </p>
     <div class="opciones">
       <button class="boton amarillo" id="b-correr">¡A CORRER!</button>
       <button class="boton" id="b-volver">VOLVER</button>
@@ -340,9 +378,36 @@ body::after {
   </div>
 </div>
 
+<div class="capa" id="privacidad" hidden>
+  <div class="tarjeta">
+    <h2 class="titulo" style="font-size: clamp(1.2rem, 5vw, 2rem)">PRIVACIDAD</h2>
+    <div class="legal">
+      <p>La Vuelta de Chapas es un juego sin anuncios, sin cuentas y sin servidor propio. Esto es todo lo que hace con tus datos.</p>
+      <h3>QUÉ SE GUARDA</h3>
+      <ul>
+        <li>El <b>nombre</b> y la <b>foto</b> que pongas a cada chapa. La foto se recorta y se reduce a 160 × 160 píxeles; la original no se guarda.</li>
+        <li>El <b>récord</b> de tiros y si prefieres el <b>modo fácil</b>.</li>
+      </ul>
+      <h3>DÓNDE</h3>
+      <p>Solo en el almacenamiento local del navegador de este dispositivo. <b>Nada se envía</b> a ningún servidor, ni al autor ni a terceros. Cada móvil o tablet tiene sus propios datos.</p>
+      <h3>QUÉ NO HACE</h3>
+      <p>No usa cookies, ni analítica, ni publicidad, ni rastreadores. Las letras y el resto de archivos se descargan de la propia web del juego.</p>
+      <h3>FOTOS DE NIÑOS</h3>
+      <p>Si pones la foto de un menor, hazlo solo si eres su padre, madre o tutor, o con su permiso.</p>
+      <h3>CÓMO BORRARLO</h3>
+      <p>Con el botón <b>QUITAR</b> de cada foto, con el botón de abajo o borrando los datos de esta web en los ajustes del navegador.</p>
+      <p id="priv-borrado" hidden><b>Listo: se han borrado los nombres, las fotos, el récord y las preferencias de este dispositivo.</b></p>
+    </div>
+    <div class="opciones">
+      <button class="boton" id="b-priv-borrar">BORRAR MIS DATOS</button>
+      <button class="boton amarillo" id="b-priv-cerrar">ENTENDIDO</button>
+    </div>
+  </div>
+</div>
+
 <div class="capa" id="final" hidden>
   <div class="tarjeta">
-    <div class="mini-chapa ganador-chapa" id="ganador-chapa">1</div>
+    <div class="podio" id="podio"></div>
     <h2 class="titulo" id="ganador-texto">¡Gana el Rojo!</h2>
     <p class="sub" id="ganador-tiros">en 12 tiros</p>
     <p class="sub parpadea" id="nuevo-record" hidden style="color: var(--ocaso-1)">¡Nuevo récord!</p>
@@ -546,6 +611,20 @@ body::after {
     }
     trazoTiza(c, izq, 4.5, 0.55, 11);
     trazoTiza(c, der, 4.5, 0.55, 23);
+    if (modoFacil) {
+      // vallas rojas y blancas, como las de las llegadas
+      for (const lado of [1, -1]) {
+        for (let i = 0; i < N - 4; i += 4) {
+          const o = lado * (TW / 2 - 3);
+          c.beginPath();
+          c.moveTo(PX[i] + NX[i] * o, PY[i] + NY[i] * o);
+          c.lineTo(PX[i + 4] + NX[i + 4] * o, PY[i + 4] + NY[i + 4] * o);
+          c.strokeStyle = (i / 4) % 2 ? "#f4f0e4" : "#e5483a";
+          c.lineWidth = 6; c.lineCap = "butt";
+          c.stroke();
+        }
+      }
+    }
     // marcas kilométricas
     for (let s = 400; s < ARCO_META - 150; s += 400) {
       const [x, y, nx, ny] = enArco(s, 0);
@@ -640,12 +719,30 @@ body::after {
     o.connect(g); g.connect(actx.destination);
     o.start(t0); o.stop(t0 + dur + 0.02);
   }
+  // "clac" metálico: ruido filtrado muy corto + dos resonancias de chapa
+  let bufRuido = null;
+  function clac(vol, agudo) {
+    if (!sonido || !actx) return;
+    const t0 = actx.currentTime;
+    if (!bufRuido) {
+      bufRuido = actx.createBuffer(1, Math.floor(actx.sampleRate * 0.08), actx.sampleRate);
+      const d = bufRuido.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+    }
+    const n = actx.createBufferSource(); n.buffer = bufRuido;
+    const bp = actx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = agudo; bp.Q.value = 3;
+    const g = actx.createGain(); g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.07);
+    n.connect(bp); bp.connect(g); g.connect(actx.destination); n.start(t0);
+    [agudo * 0.62, agudo * 1.37].forEach((f, i) => tono(f, 0.09 + i * 0.03, "sine", vol * 0.35, f * 0.97));
+  }
+  function vibrar(patron) { try { if (navigator.vibrate) navigator.vibrate(patron); } catch (e) {} }
   const sfx = {
-    tiro() { tono(1800, 0.05, "triangle", 0.18, 600); tono(320, 0.12, "sine", 0.12, 140); },
-    choque() { tono(2400, 0.04, "triangle", 0.14, 1500); },
-    fuera() { tono(420, 0.35, "sawtooth", 0.06, 130); },
+    tiro() { clac(0.5, 4200); tono(260, 0.1, "sine", 0.1, 120); vibrar(15); },
+    choque() { clac(0.4, 3000); vibrar(30); },
+    valla() { clac(0.3, 1600); tono(180, 0.12, "triangle", 0.1, 110); vibrar(20); },
+    fuera() { tono(420, 0.35, "sawtooth", 0.06, 130); vibrar([60, 40, 60]); },
     turno() { tono(660, 0.08, "sine", 0.08); },
-    meta() { [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tono(f, 0.18, "square", 0.07, null, i * 0.12)); }
+    meta() { [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tono(f, 0.18, "square", 0.07, null, i * 0.12)); vibrar([80, 60, 80, 60, 200]); }
   };
 
   // ---------- Música de 8 bits ----------
@@ -705,6 +802,7 @@ body::after {
     let f;
     if (tiro.fueraPropio) f = al(["¡Se ha ido a la cuneta!", "¡Fuera de la carretera!", "¡Uy, a la cuneta! ¡Vuelta atrás!"]);
     else if (tiro.fueraOtro) f = "¡Ha echado de la carretera a un rival!";
+    else if (tiro.rebote && Math.random() < 0.6) f = al(["¡Rebote en la valla!", "¡Menos mal que hay vallas!"]);
     else if (l === c && tiro.lider !== c) f = "¡Nuevo líder: " + c.nombre + "!";
     else if (tiro.choque) f = al(["¡Chocazo en el pelotón!", "¡Qué golpe de chapa!"]);
     else if (avance > 300) f = al(["¡Qué demarraje!", "¡Se escapa! ¡Se escapa!", "¡Tirada de campeón!"]);
@@ -793,6 +891,23 @@ body::after {
     }
     document.getElementById("menu").hidden = true;
     document.getElementById("preparar").hidden = false;
+  }
+
+  // ---------- Modo de carretera ----------
+  let modoFacil = false;
+  try { modoFacil = localStorage.getItem("vuelta-facil") === "1"; } catch (e) {}
+  function pintarModo() {
+    document.getElementById("b-normal").classList.toggle("activo", !modoFacil);
+    document.getElementById("b-facil").classList.toggle("activo", modoFacil);
+    document.getElementById("b-normal").setAttribute("aria-pressed", String(!modoFacil));
+    document.getElementById("b-facil").setAttribute("aria-pressed", String(modoFacil));
+  }
+  function ponerModo(f) {
+    if (f === modoFacil) return;
+    modoFacil = f;
+    try { localStorage.setItem("vuelta-facil", f ? "1" : "0"); } catch (e) {}
+    pintarModo();
+    medir();
   }
 
   // ---------- Cartel de turno ----------
@@ -908,7 +1023,22 @@ body::after {
         const k = cercano(c.x, c.y, c.idx, 14);
         c.idx = k.idx; c.arco = k.arco;
         if (k.arco >= ARCO_META && !ganador) { ganador = c; }
-        if (k.dist > TW / 2 && !ganador) {
+        if (modoFacil && k.dist > TW / 2 - R * 0.55 && !ganador) {
+          // rebote en la valla
+          const [qx, qy] = enArco(k.arco, 0);
+          let nx = c.x - qx, ny = c.y - qy;
+          const d = Math.hypot(nx, ny) || 1;
+          nx /= d; ny /= d;
+          const lim = TW / 2 - R * 0.55;
+          c.x = qx + nx * lim; c.y = qy + ny * lim;
+          const vn = c.vx * nx + c.vy * ny;
+          if (vn > 0) {
+            c.vx -= 1.7 * vn * nx; c.vy -= 1.7 * vn * ny;
+            if (tiro) tiro.rebote = true;
+            const ahora = performance.now();
+            if (vn > 0.4 && ahora - ultimoChoque > 80) { sfx.valla(); ultimoChoque = ahora; }
+          }
+        } else if (k.dist > TW / 2 && !ganador) {
           c.fuera = true; c.vx = c.vy = 0;
           flotantes.push({ t: "¡FUERA!", x: c.x, y: c.y, vida: 1 });
           if (tiro) { if (c === chapas[turno]) tiro.fueraPropio = true; else tiro.fueraOtro = true; }
@@ -974,8 +1104,25 @@ body::after {
     }
     setTimeout(() => {
       const g = ganador;
-      const el = document.getElementById("ganador-chapa");
-      pintarMiniChapa(el, g);
+      const orden = [g, ...chapas.filter(c => c !== g).sort((a, b) => b.arco - a.arco)].slice(0, 3);
+      const podio = document.getElementById("podio");
+      podio.innerHTML = "";
+      const clases = ["primero", "segundo", "tercero"];
+      const colocacion = orden.length === 3 ? [1, 0, 2] : orden.length === 2 ? [1, 0] : [0];
+      colocacion.forEach(i => {
+        const c = orden[i];
+        const puesto = document.createElement("div");
+        puesto.className = "puesto " + clases[i];
+        const chapa = document.createElement("div");
+        chapa.className = "mini-chapa";
+        pintarMiniChapa(chapa, c);
+        const nombre = document.createElement("div");
+        nombre.className = "nombre"; nombre.textContent = c.nombre;
+        const cajon = document.createElement("div");
+        cajon.className = "cajon"; cajon.textContent = String(i + 1);
+        puesto.append(chapa, nombre, cajon);
+        podio.appendChild(puesto);
+      });
       document.getElementById("ganador-texto").textContent = "¡GANA " + g.nombre.toUpperCase() + "!";
       document.getElementById("ganador-tiros").textContent = "en " + g.tiros + (g.tiros === 1 ? " tiro" : " tiros");
       const rec = leerRecord(), nuevo = rec === null || g.tiros < rec;
@@ -1043,6 +1190,47 @@ body::after {
     ctx.globalAlpha = 1;
   }
 
+  // la primera vez, una mano enseña el gesto: tirar hacia atrás y soltar
+  function dibujarManita(c) {
+    const i = Math.max(0, Math.min(N - 2, c.idx));
+    const tx = NY[i], ty = -NX[i];                      // dirección de la carretera
+    const t = (performance.now() % 1800) / 1800;
+    const tira = t < 0.6 ? t / 0.6 : 1;                 // 0→1 mientras tira
+    const suelta = t >= 0.6 && t < 0.75;
+    const d = R + 10 + tira * 70;
+    const hx = c.x - tx * d, hy = c.y - ty * d;
+    transfMundo(ctx);
+    if (t < 0.6) {
+      // flecha fantasma hacia delante, crece con el tirón
+      const largo = 30 + tira * 110;
+      ctx.save();
+      ctx.globalAlpha = 0.55;
+      ctx.strokeStyle = "#f4f0e4"; ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.setLineDash([2, 10]);
+      ctx.beginPath(); ctx.moveTo(c.x + tx * (R + 4), c.y + ty * (R + 4)); ctx.lineTo(c.x + tx * largo, c.y + ty * largo); ctx.stroke();
+      ctx.restore();
+    }
+    transfPantalla(ctx);
+    const [sx, sy] = aPantalla(hx, hy);
+    const tam = Math.max(34, R * 2.6 * esc);
+    ctx.save();
+    ctx.globalAlpha = suelta ? 0.4 : 0.95;
+    if (suelta) {
+      ctx.strokeStyle = "#ffcf3a"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(sx, sy, tam * (0.4 + (t - 0.6) * 4), 0, 6.283); ctx.stroke();
+    }
+    // mano dibujada: dedo índice con la yema sobre el punto, palma debajo
+    const u = tam / 10;
+    const redondo = (x, y, w, h, r) => { ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, w, h, r) : ctx.rect(x, y, w, h); };
+    ctx.translate(sx, sy);
+    ctx.fillStyle = "#f4f0e4"; ctx.strokeStyle = "#1d1f24"; ctx.lineWidth = Math.max(2, u * 0.45);
+    redondo(-1.3 * u, -1.2 * u, 2.6 * u, 6 * u, 1.3 * u); ctx.fill(); ctx.stroke();            // índice
+    redondo(1.1 * u, 2.4 * u, 2.2 * u, 3.6 * u, 1.1 * u); ctx.fill(); ctx.stroke();            // corazón
+    redondo(3.0 * u, 3.0 * u, 2.0 * u, 3.2 * u, 1.0 * u); ctx.fill(); ctx.stroke();            // anular
+    redondo(-3.4 * u, 3.6 * u, 2.4 * u, 2.2 * u, 1.1 * u); ctx.fill(); ctx.stroke();           // pulgar
+    redondo(-1.6 * u, 4.4 * u, 6.4 * u, 4.6 * u, 1.8 * u); ctx.fill(); ctx.stroke();           // palma
+    ctx.restore();
+  }
+
   function dibujarFlecha() {
     const c = chapas[turno];
     const { p, dx, dy } = potencia();
@@ -1081,6 +1269,7 @@ body::after {
     chapas.forEach((c, i) => { if (i !== turno) dibujarChapa(c, c.fuera ? 0.5 : 1, false); });
     const act = chapas[turno];
     dibujarChapa(act, act.fuera ? 0.5 : 1, fase === "apuntar");
+    if (primerTiro && fase === "apuntar" && !apunte && performance.now() > cartelHasta) dibujarManita(act);
     transfPantalla(ctx);
     chapas.forEach(c => dorsal(c, c.fuera ? 0.5 : 1));
     // textos flotantes
@@ -1151,6 +1340,33 @@ body::after {
     opciones.appendChild(b);
   });
   document.getElementById("b-correr").addEventListener("click", () => { audio(); guardarPerfiles(); nueva(numJug); });
+  document.getElementById("b-normal").addEventListener("click", () => ponerModo(false));
+  document.getElementById("b-facil").addEventListener("click", () => ponerModo(true));
+  pintarModo();
+  // ---------- Privacidad ----------
+  let privDesde = null;
+  function abrirPrivacidad(desde) {
+    privDesde = desde;
+    document.getElementById("priv-borrado").hidden = true;
+    document.getElementById(desde).hidden = true;
+    document.getElementById("privacidad").hidden = false;
+  }
+  document.getElementById("b-priv-menu").addEventListener("click", () => abrirPrivacidad("menu"));
+  document.getElementById("b-priv-preparar").addEventListener("click", () => { guardarPerfiles(); abrirPrivacidad("preparar"); });
+  document.getElementById("b-priv-cerrar").addEventListener("click", () => {
+    document.getElementById("privacidad").hidden = true;
+    if (privDesde === "preparar") abrirPreparar(numJug);
+    else document.getElementById(privDesde || "menu").hidden = false;
+  });
+  document.getElementById("b-priv-borrar").addEventListener("click", () => {
+    ["vuelta-perfiles", "vuelta-record", "vuelta-facil"].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+    perfiles = [{}, {}, {}, {}];
+    imagenes.length = 0;
+    if (modoFacil) { modoFacil = false; pintarModo(); medir(); }
+    pintarRecord();
+    document.getElementById("priv-borrado").hidden = false;
+  });
+
   document.getElementById("b-volver").addEventListener("click", () => {
     guardarPerfiles();
     document.getElementById("preparar").hidden = true;
@@ -1181,7 +1397,12 @@ body::after {
   medir();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(medir);
   requestAnimationFrame(bucle);
-  window.__vuelta = { L, N, PX, PY, TW, ARCO_META, estado: () => ({ fase, turno, esc, hayZoom }) };
+  // ganchos para las pruebas automáticas
+  window.__vuelta = {
+    L, N, PX, PY, TW, ARCO_META,
+    estado: () => ({ fase, turno, esc, hayZoom, modoFacil }),
+    colocar(i, arco) { const c = chapas[i], [x, y] = enArco(arco, 0), k = cercano(x, y, Math.round(arco / PASO), 30); c.x = x; c.y = y; c.idx = k.idx; c.arco = k.arco; }
+  };
 })();
 </script>
 
