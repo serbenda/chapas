@@ -29,7 +29,7 @@ const espera = ms => new Promise(r => setTimeout(r, ms));
 const navegador = await chromium.launch();
 
 async function abrir(ancho, alto) {
-  const p = await navegador.newPage({ viewport: { width: ancho, height: alto }, deviceScaleFactor: 2 });
+  const p = await navegador.newPage({ viewport: { width: ancho, height: alto }, deviceScaleFactor: 2, locale: "es-ES" });   // capturas del README en castellano
   await p.goto(juego);
   await p.evaluate(() => document.fonts.ready);
   await espera(600);
