@@ -83,6 +83,19 @@ Un locutor de radio *EN DIRECTO* comenta cada tirada, letra a letra, como en las
 - 🧒 **Pensado para niños de 6 a 8 años**: casi sin texto, botones grandes y sin castigos duros.
 - 🔒 **Sin anuncios, sin cuentas y sin recoger datos.** Las fotos se quedan en el propio móvil y nunca se suben a ningún sitio.
 
+## 🔒 Privacidad
+
+El juego está pensado para cumplir el RGPD y la LOPDGDD sin tener que pedir nada a nadie: **no trata datos personales fuera del propio dispositivo**.
+
+| | |
+| --- | --- |
+| **Qué se guarda** | Nombre y foto de cada chapa (recortada a 160 × 160 px), récord y modo de juego |
+| **Dónde** | Solo en el `localStorage` del navegador de ese móvil o tablet. Nada se envía a ningún servidor |
+| **Qué no hace** | Sin cookies, sin analítica, sin publicidad y sin rastreadores |
+| **Fuentes** | Al publicar, las letras se copian a la propia web, así que el juego no hace peticiones a Google ni le envía la IP de quien juega |
+| **Fotos de menores** | El juego avisa de que solo se ponga la foto de un niño con permiso de sus padres o tutores |
+| **Borrar** | Botón **QUITAR** en cada foto o **BORRAR MIS DATOS** en la pantalla de *Privacidad* |
+
 ## 📲 Instalar en el móvil
 
 | Android (Chrome) | iPhone / iPad (Safari) |
@@ -147,7 +160,7 @@ python3 -m http.server 8000
 # abre http://localhost:8000
 ```
 
-> Si cambias `index.html`, sube la versión en `sw.js` (`chapas-v4` → `chapas-v5`) para que los móviles descarguen la nueva.
+> Si cambias `index.html`, sube la versión en `sw.js` (`chapas-v5` → `chapas-v6`) para que los móviles descarguen la nueva.
 
 ### 🌿 Ramas
 
