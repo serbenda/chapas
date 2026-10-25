@@ -3,7 +3,7 @@
 Así el juego publicado no hace ninguna petición a servidores de Google
 (ni les envía la IP de quien juega). Se ejecuta al publicar en GitHub Pages.
 
-Uso: python3 scripts/fuentes_locales.py _site
+Uso: python3 scripts/fuentes_locales.py _site   (carpeta con una copia de web/)
 """
 import re
 import sys

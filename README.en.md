@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/banner.png" alt="La Vuelta de Chapas" width="100%">
+<img src="docs/img/banner.png" alt="La Vuelta de Chapas" width="100%">
 
 [🇪🇸 Español](README.md) · **🇬🇧 English**
 
@@ -30,7 +30,7 @@ In 1980s Spain, every schoolyard had the same game: draw a race track on the gro
 <table>
 <tr>
 <td width="34%" align="center" valign="top">
-<img src="docs/partida.gif" alt="Playing on a phone" width="250"><br>
+<img src="docs/img/partida.gif" alt="Playing on a phone" width="250"><br>
 <sub><b>A race on a phone:</b> the hand shows the gesture and the computer plays its turn</sub>
 </td>
 <td width="66%" valign="top">
@@ -55,16 +55,16 @@ In 1980s Spain, every schoolyard had the same game: draw a race track on the gro
 
 | | |
 | :---: | :---: |
-| <img src="docs/etapa-llana.png" alt="Flat stage"> | <img src="docs/etapa-montana.png" alt="Mountain stage"> |
+| <img src="docs/img/etapa-llana.png" alt="Flat stage"> | <img src="docs/img/etapa-montana.png" alt="Mountain stage"> |
 | **1 · Flat**: to get the hang of it | **2 · Mountain**: climbs that slow you down, descents that launch you and two mountain primes |
-| <img src="docs/etapa-adoquines.png" alt="Cobblestone stage"> | <img src="docs/etapa-final.png" alt="Grand finale"> |
+| <img src="docs/img/etapa-adoquines.png" alt="Cobblestone stage"> | <img src="docs/img/etapa-final.png" alt="Grand finale"> |
 | **3 · Cobblestones**: caps bounce and puddles make them slide | **4 · Grand finale**: a bit of everything, with the finish in the middle of the spiral |
 
 ## ✏️ Draw your own track
 
 | Drawing with your finger | Track ready! |
 | :---: | :---: |
-| <img src="docs/dibujar-trazo.png" alt="Drawing a track"> | <img src="docs/dibujar-listo.png" alt="Finished track"> |
+| <img src="docs/img/dibujar-trazo.png" alt="Drawing a track"> | <img src="docs/img/dibujar-listo.png" alt="Finished track"> |
 
 Just like in the schoolyard: on the riders screen tap **DIBUJA TU CIRCUITO** (draw your track) and paint the road with your finger, from start to finish. The game smooths the line, turns it into a chalk track and tells you if something doesn't work:
 
@@ -80,7 +80,7 @@ The track is saved on the device and appears as **5. TU CIRCUITO** to race again
 
 | Match against the computer | Goal! |
 | :---: | :---: |
-| <img src="docs/futbol-partido.png" alt="Bottle-cap football match"> | <img src="docs/futbol-gol.png" alt="Goal"> |
+| <img src="docs/img/futbol-partido.png" alt="Bottle-cap football match"> | <img src="docs/img/futbol-gol.png" alt="Goal"> |
 
 Each team has **4 caps** (goalkeeper, two defenders and a striker) and players take turns: **pick one of your caps**, flick it and hit the ball. The pitch has a kerb, so nothing goes out, and the first to **3 or 5 goals** wins. After each goal, the team that conceded kicks off.
 
@@ -88,13 +88,13 @@ Each team has **4 caps** (goalkeeper, two defenders and a striker) and players t
 
 | Overall standings | Stage podium |
 | :---: | :---: |
-| <img src="docs/clasificacion.png" alt="Overall standings"> | <img src="docs/podio.png" alt="Podium"> |
+| <img src="docs/img/clasificacion.png" alt="Overall standings"> | <img src="docs/img/podio.png" alt="Podium"> |
 
 ## 📱 On the phone
 
 | Menu | Riders | Race | Football |
 | :---: | :---: | :---: | :---: |
-| <img src="docs/movil-menu.png" alt="Menu" width="200"> | <img src="docs/movil-corredores.png" alt="Riders screen" width="200"> | <img src="docs/movil-partida.png" alt="Race with zoom" width="200"> | <img src="docs/movil-futbol.png" alt="Football on a phone" width="200"> |
+| <img src="docs/img/movil-menu.png" alt="Menu" width="200"> | <img src="docs/img/movil-corredores.png" alt="Riders screen" width="200"> | <img src="docs/img/movil-partida.png" alt="Race with zoom" width="200"> | <img src="docs/img/movil-futbol.png" alt="Football on a phone" width="200"> |
 | **Cycling** or **football**, and how many players | Name, photo, human or computer, and race type | The camera zooms in on the cap being played | The camera follows the ball |
 
 > All images are generated automatically by a bot that plays real races every time the game changes (see [Automatic screenshots](#-automatic-screenshots)).
@@ -257,30 +257,34 @@ stateDiagram-v2
 
 ```
 chapas/
-├── index.html               # Markup and styles
-├── js/
-│   ├── juego.js             # Screen, camera, drawing, turns, stages and menus
-│   ├── circuito.js          # The 4 stages, terrain and validation of hand-drawn tracks
-│   ├── fisica.js            # Movement, collisions, barriers and terrain (pure)
-│   ├── ia.js                # The cycling computer player
-│   ├── futbol.js            # Football: pitch, ball, goals and its computer player (pure)
-│   └── sonido.js            # Sound effects and 8-bit music
-├── tests/
-│   ├── fisica.test.mjs      # Track, physics and computer tests
-│   ├── futbol.test.mjs      # Football tests
-│   └── trazado.test.mjs     # Hand-drawn track tests
-├── manifest.webmanifest     # App install metadata
-├── sw.js                    # Service worker: offline play
-├── docs/                    # README images (automatic)
+├── web/                         # The game: this is what gets published to GitHub Pages
+│   ├── index.html               # Markup and styles
+│   ├── manifest.webmanifest     # App install metadata
+│   ├── sw.js                    # Service worker: offline play
+│   ├── icons/                   # Bottle-cap app icons
+│   └── js/
+│       ├── juego.js             # Screen, camera, drawing, turns, stages, menus and editor
+│       ├── circuito.js          # The 4 stages, terrain and hand-drawn track validation
+│       ├── fisica.js            # Movement, collisions, barriers and terrain (pure)
+│       ├── ia.js                # The cycling computer player
+│       ├── futbol.js            # Football: pitch, ball, goals and its computer player (pure)
+│       └── sonido.js            # Sound effects and 8-bit music
+├── tests/                       # Tests with node:test
+│   ├── fisica.test.mjs          # Tracks, physics and computer player
+│   ├── futbol.test.mjs          # Football
+│   └── trazado.test.mjs         # Hand-drawn tracks
 ├── scripts/
-│   ├── capturas.mjs         # Bot that plays and takes screenshots
-│   ├── empaquetar.mjs       # Bundles everything into a single HTML file
-│   ├── fuentes_locales.py   # Copies the fonts to the site when publishing
-│   └── banner.html          # README header
-└── .github/workflows/
-    ├── tests.yml            # Tests on every change and pull request
-    ├── capturas.yml         # Regenerates the README images
-    └── pages.yml            # Publishes the game to GitHub Pages
+│   ├── capturas.mjs             # Bot that plays and takes screenshots
+│   ├── empaquetar.mjs           # Bundles everything into a single HTML file
+│   ├── fuentes_locales.py       # Copies the fonts to the site when publishing
+│   └── banner.html              # README header
+├── docs/img/                    # README images (automatic)
+├── .github/workflows/
+│   ├── tests.yml                # Tests on every change and pull request
+│   ├── capturas.yml             # Regenerates the README images
+│   └── pages.yml                # Publishes web/ to GitHub Pages
+├── README.md · README.en.md
+└── LICENSE
 ```
 
 ### 💻 Run it locally
@@ -288,13 +292,13 @@ chapas/
 ```bash
 git clone https://github.com/serbenda/chapas.git
 cd chapas
-python3 -m http.server 8000      # modules don't load from file://
+python3 -m http.server 8000 -d web   # modules don't load from file://
 # open http://localhost:8000
 
 node --test tests/*.test.mjs     # tests
 ```
 
-> If you change the game, bump the version in `sw.js` (`chapas-v8` → `chapas-v9`) so phones download the new one.
+> If you change the game, bump the version in `web/sw.js` (`chapas-v9` → `chapas-v10`) so phones download the new one.
 
 ### 🌿 Branches
 
@@ -305,7 +309,7 @@ node --test tests/*.test.mjs     # tests
 
 ### 🤖 Automatic screenshots
 
-Every time the game changes, [GitHub Actions](.github/workflows/capturas.yml) opens it in a real Chromium with **Playwright**, plays races on all four stages, takes tablet and phone screenshots, builds the GIF with **ffmpeg** and commits them to `docs/`.
+Every time the game changes, [GitHub Actions](.github/workflows/capturas.yml) opens it in a real Chromium with **Playwright**, plays races on all four stages, takes tablet and phone screenshots, builds the GIF with **ffmpeg** and commits them to `docs/img/`.
 
 ## 🗺️ Roadmap
 

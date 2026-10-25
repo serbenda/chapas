@@ -1,7 +1,7 @@
 // Guarda el juego en el móvil para poder jugar sin internet.
 // Sube el número de versión cada vez que cambies index.html.
-const VERSION = "chapas-v8";
-const ARCHIVOS = ["./", "index.html", "js/juego.js", "js/circuito.js", "js/fisica.js", "js/ia.js", "js/futbol.js", "js/sonido.js", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png"];
+const VERSION = "chapas-v9";
+const ARCHIVOS = ["./", "index.html", "js/juego.js", "js/circuito.js", "js/fisica.js", "js/ia.js", "js/futbol.js", "js/sonido.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "icons/apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(ARCHIVOS)).then(() => self.skipWaiting()));
