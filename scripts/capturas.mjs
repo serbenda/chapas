@@ -123,6 +123,44 @@ for (const [i, id] of ["llana", "montana", "adoquines", "final"].entries()) {
   await p.close();
 }
 
+// ---------- Dibuja tu circuito ----------
+// pasa puntos del mundo (1000 × 620) a la pantalla, igual que el juego
+async function deMundoAPantalla(p) {
+  const box = await p.$eval("#lienzo", e => { const r = e.getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height }; });
+  const vertical = box.h > box.w * 1.1, mw = vertical ? 620 : 1000, mh = vertical ? 1000 : 620;
+  const esc = Math.min(box.w / mw, box.h / mh) * 0.97, ox = (box.w - mw * esc) / 2, oy = (box.h - mh * esc) / 2;
+  return ([x, y]) => vertical ? [box.x + ox + y * esc, box.y + oy + x * esc] : [box.x + ox + x * esc, box.y + oy + y * esc];
+}
+async function trazar(p, pts, { soltar = true, hasta = 1 } = {}) {
+  const aS = await deMundoAPantalla(p);
+  const [sx, sy] = aS(pts[0]);
+  await p.mouse.move(sx, sy);
+  await p.mouse.down();
+  const tramos = Math.max(1, Math.round((pts.length - 1) * hasta));
+  for (let i = 1; i <= tramos; i++) {
+    const [a, b] = pts[i - 1], [c, d] = pts[i];
+    const n = Math.ceil(Math.hypot(c - a, d - b) / 10);
+    for (let k = 1; k <= n; k++) { const [x, y] = aS([a + (c - a) * k / n, b + (d - b) * k / n]); await p.mouse.move(x, y); }
+  }
+  if (soltar) await p.mouse.up();
+}
+{
+  const circuito = [[90, 520], [450, 540], [800, 520], [900, 420], [880, 300], [560, 300], [300, 320], [120, 260], [110, 130], [350, 90], [650, 110], [900, 90]];
+  const p = await abrir(1180, 820);
+  await preparar(p, { n: 2, maquinas: [1], etapa: 0, nombres: ["Lucía", ""] });
+  await p.click("#b-dibujar");
+  await espera(300);
+  await trazar(p, circuito, { soltar: false, hasta: 0.6 });
+  await espera(200);
+  await p.screenshot({ path: resolve(docs, "dibujar-trazo.png") });
+  await p.mouse.up();
+  await p.click("#b-ed-borrar");
+  await trazar(p, circuito);
+  await espera(500);
+  await p.screenshot({ path: resolve(docs, "dibujar-listo.png") });
+  await p.close();
+}
+
 // ---------- Fútbol de chapas ----------
 async function prepararFutbol(p, nombres) {
   await p.click("#b-juego-futbol");
