@@ -27,8 +27,7 @@ jobs:
       - name: Preparar solo los archivos del juego
         run: |
           mkdir _site
-          cp index.html manifest.webmanifest sw.js icon-*.png apple-touch-icon.png _site/
-          cp -r js _site/js
+          cp -r web/. _site/
 
       - name: Servir las fuentes desde la propia web (sin peticiones a Google)
         run: python3 scripts/fuentes_locales.py _site
