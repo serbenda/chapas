@@ -85,6 +85,19 @@ A live radio commentator (*EN DIRECTO*) calls every shot, letter by letter, like
 - 🧒 **Designed for 6 to 8 year olds**: hardly any text, big buttons and no harsh penalties.
 - 🔒 **No ads, no accounts and no data collection.** Photos stay on the device and are never uploaded.
 
+## 🔒 Privacy
+
+The game is designed to comply with the GDPR and Spain's data protection law (LOPDGDD) without asking anyone for anything: **it never processes personal data outside the device itself**.
+
+| | |
+| --- | --- |
+| **What is stored** | Each cap's name and photo (cropped to 160 × 160 px), the high score and the game mode |
+| **Where** | Only in that phone or tablet's browser `localStorage`. Nothing is sent to any server |
+| **What it doesn't do** | No cookies, no analytics, no ads and no trackers |
+| **Fonts** | When published, the fonts are copied to the game's own site, so it makes no requests to Google and never sends them the player's IP address |
+| **Photos of children** | The game reminds players to only add a child's photo with their parents' or guardians' permission |
+| **Deleting** | **QUITAR** (Remove) button on each photo, or **BORRAR MIS DATOS** (Delete my data) on the *Privacidad* screen |
+
 ## 📲 Install on your phone
 
 | Android (Chrome) | iPhone / iPad (Safari) |
@@ -149,7 +162,7 @@ python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
-> If you change `index.html`, bump the version in `sw.js` (`chapas-v4` → `chapas-v5`) so phones download the new one.
+> If you change `index.html`, bump the version in `sw.js` (`chapas-v5` → `chapas-v6`) so phones download the new one.
 
 ### 🌿 Branches
 
