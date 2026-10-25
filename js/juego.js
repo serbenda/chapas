@@ -4,6 +4,7 @@ import { WW, WH, TW, R, PASO, ETAPAS, construirPista, posicionesSalida } from ".
 import { pasoFisica, velocidadTiro } from "./fisica.js";
 import { elegirTiro, NIVELES } from "./ia.js";
 import { activarAudio, alternarSonido, haySonido, sfx, arrancarMusica } from "./sonido.js";
+import { CAMPO, RB, POSTES, crearPartido, colocarSaque, balonDe, pasoFutbol, elegirTiroFutbol, porteriaRival } from "./futbol.js";
 
 const $ = id => document.getElementById(id);
 
@@ -32,8 +33,13 @@ let escFit = 1, escZoom = 1, escFondo = 1, fondoW = 1, fondoH = 1, hayZoom = fal
 const cam = { esc: 1, cx: WW / 2, cy: WH / 2 };
 
 let pista = construirPista(ETAPAS[0]);
+let juegoModo = leer("vuelta-juego", "vuelta") === "futbol" ? "futbol" : "vuelta";
+let partido = null;   // { goles: [0, 0], objetivo }
+let sel = -1;         // en el fútbol, chapa elegida para tirar
+let golesObjetivo = leer("vuelta-goles", 3) === 5 ? 5 : 3;
 
 function aPantalla(x, y) { return vertical ? [ox + y * esc, oy + x * esc] : [ox + x * esc, oy + y * esc]; }
+function aMundo(sx, sy) { const a = (sx - ox) / esc, b = (sy - oy) / esc; return vertical ? [b, a] : [a, b]; }
 function vecAMundo(dx, dy) { return vertical ? [dy / esc, dx / esc] : [dx / esc, dy / esc]; }
 function transfMundo(c) {
   if (vertical) c.setTransform(0, esc * dpr, esc * dpr, 0, ox * dpr, oy * dpr);
@@ -63,6 +69,7 @@ function medir() {
   moverCamara(true);
 }
 function objetivoCamara() {
+  if (juegoModo === "futbol") return objetivoCamaraFutbol();
   const sigue = hayZoom && !verTodo && chapas.length && (fase === "apuntar" || fase === "maquina" || fase === "rodando" || fase === "volviendo");
   if (!sigue) return { esc: escFit, cx: WW / 2, cy: WH / 2 };
   const c = chapas[turno];
@@ -108,9 +115,7 @@ function tramo(c, a0, a1) {
   for (let i = i0; i <= i1; i++) i === i0 ? c.moveTo(PX[i], PY[i]) : c.lineTo(PX[i], PY[i]);
 }
 
-function pintarFondo() {
-  const { PX, PY, NX, NY, N } = pista;
-  const c = fctx;
+function pintarAsfalto(c) {
   transfPantalla(c);
   c.fillStyle = "#39404c";
   c.fillRect(0, 0, fondoW, fondoH);
@@ -120,6 +125,12 @@ function pintarFondo() {
     c.fillStyle = r() < 0.5 ? "rgba(20,24,32,0.35)" : "rgba(170,178,190,0.18)";
     c.fillRect(r() * fondoW, r() * fondoH, 1.4, 1.4);
   }
+}
+function pintarFondo() {
+  if (juegoModo === "futbol") { pintarCampo(); return; }
+  const { PX, PY, NX, NY, N } = pista;
+  const c = fctx;
+  pintarAsfalto(c);
   transfMundo(c);
   // carretera frotada con tiza
   tramo(c, 0, pista.L);
@@ -412,6 +423,13 @@ function abrirPreparar(n) {
     refrescar();
   }
   pintarEleccion();
+  const futbol = juegoModo === "futbol";
+  $("preparar-titulo").textContent = futbol ? "EQUIPOS" : "CORREDORES";
+  $("fila-goles").hidden = !futbol;
+  $("fila-carrera").hidden = futbol;
+  $("fila-carretera").hidden = futbol;
+  if (futbol) $("etapas").hidden = true;
+  pintarGoles();
   $("menu").hidden = true;
   $("preparar").hidden = false;
 }
@@ -489,6 +507,7 @@ let flotantes = [], confeti = [], ultimoChoque = 0;
 let pasadasCima = [];    // cuántas chapas han coronado cada cima en esta etapa
 
 function iniciarCarrera() {
+  if (juegoModo === "futbol") { iniciarPartido(); return; }
   guardarPerfiles();
   guardar("vuelta-carrera", eleccion);
   jugadores = [];
@@ -543,6 +562,8 @@ function portadores() {
 }
 
 function pintarTurno() {
+  if (juegoModo === "futbol") { pintarTurnoFutbol(); return; }
+  $("carrera").hidden = false; $("marcador").hidden = true;
   const c = chapas[turno];
   pintarMiniChapa($("turno-chapa"), c);
   $("turno-texto").textContent = (c.tipo === "persona" ? "Te toca: " : "Piensa: ") + c.nombre;
@@ -563,6 +584,7 @@ function pintarCarrera() {
 }
 
 function empezarTurno() {
+  if (juegoModo === "futbol") { empezarTurnoFutbol(); return; }
   const c = chapas[turno];
   cartelTurno(c);
   pintarTurno();
@@ -590,8 +612,20 @@ function potencia() {
 function posPuntero(e) { const r = lienzo.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
 lienzo.addEventListener("pointerdown", e => {
   activarAudio();
-  if (fase !== "apuntar" || performance.now() < cartelHasta || chapas[turno].tipo !== "persona") return;
+  if (fase !== "apuntar" || performance.now() < cartelHasta) return;
   const [x, y] = posPuntero(e);
+  if (juegoModo === "futbol") {
+    if (jugadores[turno].tipo !== "persona") return;
+    // elige la chapa propia más cercana al dedo
+    let mejor = -1, md = Math.max(70, R * esc * 3.2);
+    chapas.forEach((c, i) => {
+      if (c.tipo !== "chapa" || c.equipo !== turno) return;
+      const [sx, sy] = aPantalla(c.x, c.y), d = Math.hypot(sx - x, sy - y);
+      if (d < md) { md = d; mejor = i; }
+    });
+    if (mejor < 0) return;
+    sel = mejor;
+  } else if (chapas[turno].tipo !== "persona") return;
   apunte = { sx: x, sy: y, cx: x, cy: y, id: e.pointerId };
   try { lienzo.setPointerCapture(e.pointerId); } catch (err) {}
 });
@@ -611,6 +645,16 @@ lienzo.addEventListener("pointerup", e => {
 lienzo.addEventListener("pointercancel", () => { apunte = null; });
 
 function disparar(dx, dy, p) {
+  if (juegoModo === "futbol") {
+    const c = chapas[sel], v = velocidadTiro(p);
+    c.vx = dx * v; c.vy = dy * v;
+    const b = balonDe(chapas);
+    tiro = { balon: { x: b.x, y: b.y }, toque: false, palo: false, equipo: turno };
+    fase = "rodando";
+    $("pista-ayuda").hidden = true;
+    sfx.tiro();
+    return;
+  }
   const c = chapas[turno];
   chapas.forEach(o => { o.guardado = { x: o.x, y: o.y, idx: o.idx, arco: o.arco }; o.fuera = false; });
   const v = velocidadTiro(p);
@@ -625,6 +669,7 @@ function disparar(dx, dy, p) {
 
 // ---------- Física y reglas ----------
 function paso() {
+  if (juegoModo === "futbol") { pasoPartido(); return; }
   const ev = [];
   const moviendo = pasoFisica(chapas, pista, { facil: modoFacil }, ev);
   const ahora = performance.now();
@@ -874,9 +919,9 @@ function dorsal(c, alfa) {
 }
 
 // la primera vez, una mano enseña el gesto: tirar hacia atrás y soltar
-function dibujarManita(c) {
-  const i = Math.max(0, Math.min(pista.N - 2, c.idx));
-  const tx = pista.NY[i], ty = -pista.NX[i];
+function dibujarManita(c, dir) {
+  const i = Math.max(0, Math.min(pista.N - 2, c.idx || 0));
+  const [tx, ty] = dir || [pista.NY[i], -pista.NX[i]];
   const t = (performance.now() % 1800) / 1800;
   const tira = t < 0.6 ? t / 0.6 : 1;
   const suelta = t >= 0.6 && t < 0.75;
@@ -942,6 +987,7 @@ function dibujar() {
   const f = esc / escFondo;
   ctx.drawImage(fondo, ox - MARGEN * esc, oy - MARGEN * esc, fondoW * f, fondoH * f);
   if (!chapas.length) return;
+  if (juegoModo === "futbol") { dibujarPartido(); return; }
   transfMundo(ctx);
   const act = chapas[turno];
   if (fase === "apuntar" && apunte) { const a = potencia(); dibujarFlecha(act, a.p, a.dx, a.dy); }
@@ -955,6 +1001,9 @@ function dibujar() {
   if (primerTiro && fase === "apuntar" && act.tipo === "persona" && !apunte && performance.now() > cartelHasta) dibujarManita(act);
   transfPantalla(ctx);
   chapas.forEach(c => dorsal(c, c.fuera ? 0.5 : 1));
+  dibujarEfectos();
+}
+function dibujarEfectos() {
   ctx.font = "18px " + getComputedStyle(document.documentElement).getPropertyValue("--f-arcade");
   ctx.textAlign = "center";
   flotantes.forEach(fl => {
@@ -976,6 +1025,7 @@ function actualizar() {
   if (fase === "maquina" && tiroMaquina && performance.now() - tiroMaquina.t0 > 900) {
     const t = tiroMaquina;
     tiroMaquina = null;
+    if (t.indice !== undefined) sel = t.indice;
     disparar(t.dx, t.dy, t.p);
   }
   if (fase === "rodando") paso();
@@ -996,7 +1046,7 @@ function actualizar() {
   flotantes = flotantes.filter(f => f.vida > 0);
   confeti.forEach(p => { p.x += p.vx; p.y += p.vy; });
   confeti = confeti.filter(p => p.y < ch + 30);
-  if (fase === "rodando") pintarCarreraSuave();
+  if (fase === "rodando" && juegoModo === "vuelta") pintarCarreraSuave();
 }
 let ultimaBarra = 0;
 function pintarCarreraSuave() {
@@ -1015,19 +1065,270 @@ function bucle(t) {
   requestAnimationFrame(bucle);
 }
 
+// ---------- Fútbol de chapas ----------
+function iniciarPartido() {
+  guardarPerfiles();
+  numJug = 2;
+  jugadores = [0, 1].map(i => ({ ...CORREDORES[i], i, nombre: nombreDe(i), foto: perfiles[i].foto || null, img: imagenDe(i), tipo: tipoDe(i) }));
+  chapas = crearPartido().map(c => c.tipo === "chapa"
+    ? { ...c, i: c.equipo, color: jugadores[c.equipo].color, dorsal: c.n + 1, foto: jugadores[c.equipo].foto, img: jugadores[c.equipo].img }
+    : c);
+  partido = { goles: [0, 0], objetivo: golesObjetivo };
+  carrera = null; turno = 0; sel = -1; ganador = null; apunte = null; tiroMaquina = null; flotantes = []; confeti = []; tiro = null;
+  ["menu", "preparar", "final", "clasif", "privacidad"].forEach(id => { $(id).hidden = true; });
+  $("locutor").hidden = true;
+  arrancarMusica();
+  fase = "apuntar";
+  medir();
+  pintarTurno();
+  moverCamara(true);
+  mostrarCartel({ chapa: null, arriba: "PARTIDO A " + partido.objetivo + " GOLES", nombre: "¡A JUGAR!", dur: 1500 });
+  const este = partido;
+  setTimeout(() => {
+    if (partido !== este || fase !== "apuntar") return;
+    locutor("¡Empieza el partido! Saca " + jugadores[0].nombre);
+    empezarTurno();
+  }, 1450);
+}
+function pintarMarcador() {
+  if (!partido) return;
+  [0, 1].forEach(e => {
+    pintarMiniChapa($("m-chapa-" + e), jugadores[e]);
+    $("goles-" + e).textContent = String(partido.goles[e]);
+  });
+  $("marcador").setAttribute("aria-label", jugadores[0].nombre + " " + partido.goles[0] + ", " + jugadores[1].nombre + " " + partido.goles[1]);
+}
+function pintarTurnoFutbol() {
+  $("carrera").hidden = true; $("marcador").hidden = false;
+  const j = jugadores[turno];
+  pintarMiniChapa($("turno-chapa"), j);
+  $("turno-texto").textContent = (j.tipo === "persona" ? "Te toca: " : "Piensa: ") + j.nombre;
+  $("pista-ayuda").hidden = !(primerTiro && j.tipo === "persona");
+  pintarMarcador();
+}
+function empezarTurnoFutbol() {
+  const j = jugadores[turno];
+  sel = -1;
+  mostrarCartel({ chapa: j, arriba: j.tipo === "persona" ? "TURNO DE" : "PIENSA", nombre: j.nombre.toUpperCase() });
+  pintarTurno();
+  if (j.tipo !== "persona") {
+    fase = "maquina";
+    const espera = Math.max(0, cartelHasta - performance.now()) + 250;
+    const este = partido, equipo = turno;
+    setTimeout(() => {
+      if (partido !== este || fase !== "maquina" || turno !== equipo) return;
+      const t = elegirTiroFutbol(chapas, equipo, j.tipo);
+      sel = t.indice;
+      tiroMaquina = { ...t, t0: performance.now() };
+    }, espera);
+  } else fase = "apuntar";
+}
+function objetivoCamaraFutbol() {
+  const b = chapas.length ? balonDe(chapas) : null;
+  const sigue = hayZoom && !verTodo && b && (fase === "apuntar" || fase === "maquina" || fase === "rodando");
+  if (!sigue) return { esc: escFit, cx: WW / 2, cy: WH / 2 };
+  const foco = fase !== "rodando" && sel >= 0 ? chapas[sel] : b;
+  const e = escZoom;
+  const hsx = cw / 2 / e, hsy = ch / 2 / e;
+  const hx = vertical ? hsy : hsx, hy = vertical ? hsx : hsy;
+  const lim = (v, h, tam) => h * 2 >= tam + 2 * MARGEN ? tam / 2 : Math.max(h - MARGEN, Math.min(tam + MARGEN - h, v));
+  return { esc: e, cx: lim(foco.x, hx, WW), cy: lim(foco.y, hy, WH) };
+}
+function pasoPartido() {
+  const ev = [];
+  const mov = pasoFutbol(chapas, ev);
+  const ahora = performance.now();
+  for (const e of ev) {
+    if (e.tipo === "gol") { golMarcado(e.equipo); return; }
+    if (e.tipo === "toque") {
+      if (tiro) { tiro.algunToque = true; if (e.c === chapas[sel]) tiro.toque = true; }
+      if (ahora - ultimoChoque > 60) { sfx.choque(); ultimoChoque = ahora; }
+    } else if (e.tipo === "choque") {
+      if (ahora - ultimoChoque > 60) { sfx.choque(); ultimoChoque = ahora; }
+    } else if (e.tipo === "palo") {
+      if (tiro) tiro.palo = true;
+      sfx.valla();
+      flotantes.push({ t: "¡PALO!", x: e.c.x, y: e.c.y, vida: 1, color: "#e5483a" });
+    } else if (e.tipo === "pared" && e.c.tipo === "balon" && e.fuerza > 1.5 && ahora - ultimoChoque > 80) {
+      sfx.valla(); ultimoChoque = ahora;
+    }
+  }
+  if (!mov) {
+    comentarFutbol();
+    turno = 1 - turno;
+    sfx.turno();
+    empezarTurno();
+  }
+}
+function comentarFutbol() {
+  if (!tiro) return;
+  const b = balonDe(chapas), [gx, gy] = porteriaRival(tiro.equipo);
+  const antes = Math.hypot(tiro.balon.x - gx, tiro.balon.y - gy), ahora = Math.hypot(b.x - gx, b.y - gy);
+  let f;
+  if (tiro.palo) f = al(["¡Al palo! ¡Uyyy!", "¡El palo lo ha salvado!"]);
+  else if (!tiro.algunToque) f = al(["¡No ha tocado el balón!", "¡Ni rozarlo!"]);
+  else if (ahora < 220) f = al(["¡Peligro en el área!", "¡Casi es gol!"]);
+  else if (antes - ahora > 220) f = al(["¡Qué pase!", "¡Buen toque, avanza el equipo!"]);
+  else if (antes - ahora < -150) f = al(["¡Balón para atrás!", "¡Uy, hacia su propio campo!"]);
+  else f = al(["¡Buen toque!", "¡Sigue el partido!", "¡Tiki-taka de chapas!"]);
+  locutor(f);
+  tiro = null;
+}
+function golMarcado(eq) {
+  fase = "gol";
+  tiroMaquina = null;
+  partido.goles[eq]++;
+  const propia = tiro && tiro.equipo !== eq;
+  tiro = null;
+  const b = balonDe(chapas);
+  for (const c of chapas) { c.vx = c.vy = 0; }
+  flotantes.push({ t: "¡GOL!", x: b.x, y: b.y, vida: 2, color: "#ffcf3a" });
+  sfx.meta();
+  locutor(propia ? "¡Gol en propia puerta! Punto para " + jugadores[eq].nombre : "¡GOOOOL de " + jugadores[eq].nombre + "!");
+  for (let i = 0; i < 90; i++) {
+    confeti.push({ x: cw * Math.random(), y: -20 - Math.random() * ch * 0.4, vx: (Math.random() - 0.5) * 2, vy: 2 + Math.random() * 3, c: [jugadores[eq].color, "#f4f0e4"][i % 2] });
+  }
+  pintarMarcador();
+  const este = partido;
+  if (partido.goles[eq] >= partido.objetivo) {
+    setTimeout(() => {
+      if (partido !== este) return;
+      fase = "fin";
+      const g = jugadores[eq], o = jugadores[1 - eq];
+      mostrarFinal([g, o], { titulo: "¡GANA " + g.nombre.toUpperCase() + "!", sub: partido.goles[eq] + " - " + partido.goles[1 - eq], record: false });
+    }, 2000);
+  } else {
+    setTimeout(() => {
+      if (partido !== este || fase !== "gol") return;
+      colocarSaque(chapas);
+      turno = 1 - eq;      // saca el que ha recibido el gol
+      empezarTurno();
+    }, 2300);
+  }
+}
+
+function textoEn(c, t, x, y, tam, color) {
+  const [sx, sy] = aPantalla(x, y);
+  c.font = fuenteTiza(tam);
+  c.textAlign = "center"; c.textBaseline = "middle";
+  c.fillStyle = color;
+  c.fillText(t, sx, sy);
+}
+function pintarCampo() {
+  const c = fctx;
+  pintarAsfalto(c);
+  transfMundo(c);
+  const { x0, x1, y0, y1, gy0, gy1, fondo } = CAMPO;
+  c.fillStyle = "rgba(244,240,228,0.05)";
+  c.fillRect(x0, y0, x1 - x0, y1 - y0);
+  for (let k = 1; k < 10; k += 2) { c.fillStyle = "rgba(244,240,228,0.025)"; c.fillRect(x0 + k * (x1 - x0) / 10, y0, (x1 - x0) / 10, y1 - y0); }
+  const punto = (x, y) => { c.fillStyle = "rgba(244,240,228,0.75)"; c.beginPath(); c.arc(x, y, 4, 0, 6.283); c.fill(); };
+  const arco = (cx, cy, r, sem, a0 = 0, a1 = 6.283) => {
+    const pts = [];
+    for (let k = 0; k <= 40; k++) { const a = a0 + (a1 - a0) * k / 40; pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]); }
+    trazoTiza(c, pts, 4, 0.6, sem);
+  };
+  trazoTiza(c, [[x0, y0], [x1, y0], [x1, y1], [x0, y1], [x0, y0]], 4.5, 0.65, 11);
+  trazoTiza(c, [[500, y0], [500, y1]], 4, 0.6, 12);
+  arco(500, 310, 70, 13);
+  punto(500, 310);
+  for (const lado of [0, 1]) {
+    const X = lado ? x1 : x0, sg = lado ? -1 : 1;
+    trazoTiza(c, [[X, 170], [X + sg * 140, 170], [X + sg * 140, 450], [X, 450]], 4, 0.6, 20 + lado);
+    trazoTiza(c, [[X, 225], [X + sg * 55, 225], [X + sg * 55, 395], [X, 395]], 4, 0.6, 22 + lado);
+    punto(X + sg * 105, 310);
+    arco(X + sg * 105, 310, 60, 24 + lado, lado ? Math.PI - 0.95 : -0.95, lado ? Math.PI + 0.95 : 0.95);
+    // red de la portería
+    const nx0 = lado ? x1 : x0 - fondo, nx1 = lado ? x1 + fondo : x0;
+    c.save();
+    c.strokeStyle = "rgba(244,240,228,0.3)"; c.lineWidth = 1.2;
+    c.beginPath();
+    for (let x = nx0; x <= nx1 + 0.1; x += 8) { c.moveTo(x, gy0); c.lineTo(x, gy1); }
+    for (let y = gy0; y <= gy1 + 0.1; y += 8) { c.moveTo(nx0, y); c.lineTo(nx1, y); }
+    c.stroke();
+    c.restore();
+    trazoTiza(c, [[X, gy0], [X - sg * fondo, gy0], [X - sg * fondo, gy1], [X, gy1]], 4, 0.85, 26 + lado);
+  }
+  for (const [px, py] of POSTES) { c.fillStyle = "#f4f0e4"; c.beginPath(); c.arc(px, py, 4.5, 0, 6.283); c.fill(); }
+  transfPantalla(c);
+  if (partido && jugadores.length === 2 && !vertical) {
+    textoEn(c, jugadores[0].nombre.toUpperCase(), 280, 590, 20, jugadores[0].color);
+    textoEn(c, jugadores[1].nombre.toUpperCase(), 720, 590, 20, jugadores[1].color);
+  }
+  if (!vertical) textoEn(c, "CHAPAS F.C.", 500, 32, 18, "rgba(244,240,228,0.5)");
+}
+function dibujarBalon(b) {
+  ctx.save();
+  ctx.translate(b.x, b.y);
+  ctx.fillStyle = "rgba(10,12,18,0.45)";
+  ctx.beginPath(); ctx.arc(1.5, 2.5, RB, 0, 6.283); ctx.fill();
+  ctx.fillStyle = "#f8f6ef";
+  ctx.beginPath(); ctx.arc(0, 0, RB, 0, 6.283); ctx.fill();
+  ctx.fillStyle = "#1d1f24";
+  ctx.beginPath();
+  for (let k = 0; k < 5; k++) { const a = k / 5 * 6.283 - 1.57; const x = Math.cos(a) * RB * 0.38, y = Math.sin(a) * RB * 0.38; k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+  ctx.closePath(); ctx.fill();
+  for (let k = 0; k < 5; k++) {
+    const a = k / 5 * 6.283 + 0.63;
+    ctx.beginPath(); ctx.arc(Math.cos(a) * RB * 0.92, Math.sin(a) * RB * 0.92, RB * 0.26, 0, 6.283); ctx.fill();
+  }
+  ctx.strokeStyle = "#5d636d"; ctx.lineWidth = 0.8;
+  ctx.beginPath(); ctx.arc(0, 0, RB, 0, 6.283); ctx.stroke();
+  ctx.restore();
+}
+function dibujarPartido() {
+  transfMundo(ctx);
+  const b = balonDe(chapas);
+  const j = jugadores[turno];
+  if (fase === "apuntar" && apunte && sel >= 0) { const a = potencia(); dibujarFlecha(chapas[sel], a.p, a.dx, a.dy); }
+  if (fase === "maquina" && tiroMaquina && sel >= 0) {
+    const k = Math.min(1, (performance.now() - tiroMaquina.t0) / 700);
+    dibujarFlecha(chapas[sel], tiroMaquina.p * k, tiroMaquina.dx, tiroMaquina.dy);
+  }
+  const eligiendo = fase === "apuntar" || fase === "maquina";
+  chapas.forEach((c, i) => {
+    if (c.tipo !== "chapa") return;
+    dibujarChapa(c, 1, eligiendo && c.equipo === turno && (sel < 0 || sel === i), {});
+  });
+  dibujarBalon(b);
+  if (primerTiro && fase === "apuntar" && j && j.tipo === "persona" && !apunte && performance.now() > cartelHasta) {
+    // la mano enseña a tirar con la chapa propia más cercana al balón
+    let cerca = null, md = Infinity;
+    chapas.forEach(c => { if (c.tipo === "chapa" && c.equipo === turno) { const d = Math.hypot(c.x - b.x, c.y - b.y); if (d < md) { md = d; cerca = c; } } });
+    if (cerca) dibujarManita(cerca, [(b.x - cerca.x) / md, (b.y - cerca.y) / md]);
+  }
+  transfPantalla(ctx);
+  chapas.forEach(c => { if (c.tipo === "chapa") dorsal(c, 1); });
+  dibujarEfectos();
+}
+
 // ---------- Menús ----------
 const opciones = $("opciones");
-[2, 3, 4].forEach(n => {
-  const b = document.createElement("button");
-  b.className = "boton";
-  b.id = "b-jug-" + n;
-  const fila = CORREDORES.slice(0, n).map(c => '<i style="--c:' + c.color + '"></i>').join("");
-  b.innerHTML = "<span>" + n + '</span><span class="fila">' + fila + "</span>";
-  b.setAttribute("aria-label", n + " corredores");
-  b.addEventListener("click", () => { activarAudio(); abrirPreparar(n); });
-  opciones.appendChild(b);
-});
-{
+function montarOpciones() {
+  opciones.innerHTML = "";
+  const futbol = juegoModo === "futbol";
+  $("b-juego-vuelta").classList.toggle("activo", !futbol);
+  $("b-juego-futbol").classList.toggle("activo", futbol);
+  $("b-juego-vuelta").setAttribute("aria-pressed", String(!futbol));
+  $("b-juego-futbol").setAttribute("aria-pressed", String(futbol));
+  $("menu-sub").textContent = futbol ? "Elige jugadores" : "Elige corredores";
+  $("menu-instr").textContent = futbol
+    ? "Elige tu chapa, tira hacia atrás y suelta. ¡Mete el balón en la portería rival!"
+    : "Tira de la chapa hacia atrás y suelta. ¡Si te sales, vuelves atrás!";
+  (futbol ? [2] : [2, 3, 4]).forEach(n => {
+    const b = document.createElement("button");
+    b.className = "boton";
+    b.id = "b-jug-" + n;
+    const fila = CORREDORES.slice(0, n).map(c => '<i style="--c:' + c.color + '"></i>').join("");
+    b.innerHTML = "<span>" + n + '</span><span class="fila">' + fila + "</span>";
+    b.setAttribute("aria-label", n + (futbol ? " jugadores" : " corredores"));
+    b.addEventListener("click", () => {
+      activarAudio();
+      if (futbol) { perfiles[0].tipo = "persona"; perfiles[1].tipo = "persona"; }
+      abrirPreparar(n);
+    });
+    opciones.appendChild(b);
+  });
   const b = document.createElement("button");
   b.className = "boton";
   b.id = "b-jug-maquina";
@@ -1041,6 +1342,24 @@ const opciones = $("opciones");
   });
   opciones.appendChild(b);
 }
+function ponerJuego(m) {
+  if (m === juegoModo) return;
+  juegoModo = m;
+  guardar("vuelta-juego", m);
+  chapas = []; partido = null; carrera = null;
+  montarOpciones();
+  medir();
+}
+$("b-juego-vuelta").addEventListener("click", () => ponerJuego("vuelta"));
+$("b-juego-futbol").addEventListener("click", () => ponerJuego("futbol"));
+montarOpciones();
+function pintarGoles() {
+  [3, 5].forEach(n => {
+    $("b-goles-" + n).classList.toggle("activo", golesObjetivo === n);
+    $("b-goles-" + n).setAttribute("aria-pressed", String(golesObjetivo === n));
+  });
+}
+[3, 5].forEach(n => $("b-goles-" + n).addEventListener("click", () => { golesObjetivo = n; guardar("vuelta-goles", n); pintarGoles(); }));
 montarEtapas();
 $("b-una").addEventListener("click", () => { eleccion.modo = "etapa"; guardar("vuelta-carrera", eleccion); pintarEleccion(); });
 $("b-vuelta").addEventListener("click", () => { eleccion.modo = "vuelta"; guardar("vuelta-carrera", eleccion); pintarEleccion(); });
@@ -1073,6 +1392,7 @@ $("b-priv-borrar").addEventListener("click", () => {
   perfiles = [{}, {}, {}, {}];
   imagenes.length = 0;
   eleccion = { modo: "etapa", etapa: 0 };
+  golesObjetivo = 3;
   if (modoFacil) { modoFacil = false; pintarModo(); medir(); }
   pintarRecord();
   $("priv-borrado").hidden = false;
@@ -1116,6 +1436,21 @@ window.__vuelta = {
     c.x = x; c.y = y; c.idx = k.idx; c.arco = k.arco;
   },
   arcoMeta: () => pista.arcoMeta,
+  marcador: () => partido && partido.goles.slice(),
+  // fútbol: la chapa propia más cercana tira hacia el balón
+  tirarAlBalon(p) {
+    if (fase !== "apuntar" || juegoModo !== "futbol") return false;
+    const b = balonDe(chapas);
+    let mejor = -1, md = Infinity;
+    chapas.forEach((c, i) => { if (c.tipo === "chapa" && c.equipo === turno) { const d = Math.hypot(c.x - b.x, c.y - b.y); if (d < md) { md = d; mejor = i; } } });
+    sel = mejor;
+    const c = chapas[sel], d = Math.hypot(b.x - c.x, b.y - c.y) || 1;
+    primerTiro = false;
+    disparar((b.x - c.x) / d, (b.y - c.y) / d, p);
+    return true;
+  },
+  balonA(x, y) { const b = balonDe(chapas); b.x = x; b.y = y; },
+  chapaA(i, x, y) { chapas[i].x = x; chapas[i].y = y; },
   // tiro recto por la carretera, sin depender de la pantalla
   tirarRecto(p) {
     if (fase !== "apuntar") return false;
