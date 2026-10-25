@@ -1,2 +1,5 @@
 node_modules/
 docs/.fotogramas/
+docs/img/.fotogramas/
+__pycache__/
+*.pyc
