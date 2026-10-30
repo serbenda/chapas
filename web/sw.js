@@ -1,6 +1,6 @@
 // Guarda el juego en el móvil para poder jugar sin internet.
 // Sube el número de versión cada vez que cambies index.html.
-const VERSION = "chapas-v11";
+const VERSION = "chapas-v12";
 const ARCHIVOS = ["./", "index.html", "js/juego.js", "js/textos.js", "js/circuito.js", "js/fisica.js", "js/ia.js", "js/futbol.js", "js/sonido.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "icons/apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
@@ -12,6 +12,8 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
   const url = new URL(e.request.url);
+  // El contador de visitas siempre va a la red, nunca a la copia guardada
+  if (/(^|\.)(goatcounter\.com|gc\.zgo\.at)$/.test(url.hostname)) return;
   // Fuentes de Google: se guardan la primera vez que se descargan
   if (url.hostname.endsWith("googleapis.com") || url.hostname.endsWith("gstatic.com")) {
     e.respondWith(caches.open(VERSION).then(c => c.match(e.request).then(r => r || fetch(e.request).then(res => { c.put(e.request, res.clone()); return res; }))));

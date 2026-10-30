@@ -533,6 +533,7 @@ let flotantes = [], confeti = [], ultimoChoque = 0;
 let pasadasCima = [];    // cuántas chapas han coronado cada cima en esta etapa
 
 function iniciarCarrera() {
+  try { globalThis.goatcounter?.count?.({ path: "partida/chapas", title: juegoModo === "futbol" ? "Partido de fútbol" : "Carrera", event: true }); } catch { /* sin contador de visitas */ }
   if (juegoModo === "futbol") { iniciarPartido(); return; }
   guardarPerfiles();
   guardar("vuelta-carrera", eleccion);
